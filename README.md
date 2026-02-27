@@ -4,14 +4,14 @@
 
 ---
 
-## 🌟 Vision
+## Vision
 To create a seamless, intelligent, and human-centric health platform that anticipates needs rather than just reacting to them. MySNG combines **Generative AI**, **Hyper-local Data**, and **Gamification** to make managing health engaging and effortless.
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-### 1. 🧠 Cortex: The AI Health Architect
+### 1. Cortex: The AI Health Architect
 At the heart of MySNG is **Cortex**, an advanced NLU (Natural Language Understanding) driven assistant. It doesn't just answer questions; it **takes action**.
 
 #### **Capabilities:**
@@ -23,7 +23,7 @@ At the heart of MySNG is **Cortex**, an advanced NLU (Natural Language Understan
     *   *AI:* Adds the schedule to your Medication Tracker and sets up push notifications.
     *   *User:* "Did I take my meds today?"
     *   *AI:* Checks your daily log and reports status.
-*   **SOS Emergency Mode 🚨**:
+*   **SOS Emergency Mode**:
     *   *Trigger:* Say **"Emergency"**, **"Chest pain"**, or **"Help"**.
     *   *Action:* The interface shifts to **Red Alert Mode**.
     *   *Features:* One-tap **999 Call**, instant **Hospital Navigation** (via Google Maps), and Medical ID display.
@@ -31,7 +31,7 @@ At the heart of MySNG is **Cortex**, an advanced NLU (Natural Language Understan
     *   Understands "nearby" to trigger GPS.
     *   Handles cancellations smoothly ("Actually, cancel that").
 
-### 2. 📊 Quantum Health Dashboard
+### 2. Quantum Health Dashboard
 A visually stunning, glassmorphic command center for your health data.
 *   **MySejahtera Health Score**: A proprietary algorithm that calculates a daily score (0-100) based on your BMI, sleep patterns, and step count.
 *   **Visual Calorie Tracker**: Snap a photo of your food (simulated) or log it to track intake against your BMR.
@@ -39,13 +39,13 @@ A visually stunning, glassmorphic command center for your health data.
     *   **XP & Levels**: Earn XP for logging health data, checking in, or completing quizzes.
     *   **Badges**: Unlock achievements like "Early Bird" (Morning check-ins) or "Marathoner" (10k steps).
 
-### 3. �️ Infectious Disease Tracker (Hotspots)
+### 3. Infectious Disease Tracker (Hotspots)
 Real-time, hyper-local risk assessment.
 *   **Dynamic Heatmaps**: Visualizes active clusters of Dengue, COVID-19, and Influenza on an interactive map.
 *   **Proximity Radar**: Runs in the background (simulated) to warn you if you enter a "Red Zone".
 *   **Premise Check-In**: A fast, precise QR scanner for contact tracing.
 
-### 4. 🪪 Digital Health ID (Holo-ID)
+### 4.  Digital Health ID (Holo-ID)
 Your medical identity, modernized.
 *   **Holographic Design**: A secure, animated digital ID card with gyroscope effects.
 *   **Vaccination Passports**: View, download, and share verified PDF vaccine certificates.
@@ -53,7 +53,7 @@ Your medical identity, modernized.
 
 ---
 
-## 📱 How to Use
+##  How to Use
 
 ### **AI Chat (Cortex)**
 1.  Tap the **"Ask AI"** floating button or the bottom navigation bar.
@@ -76,7 +76,7 @@ Your medical identity, modernized.
 
 ---
 
-## 🛠️ Technical Architecture
+## Technical Architecture
 
 ### **Tech Stack**
 *   **Framework**: Flutter 3.x (Dart)
@@ -96,7 +96,7 @@ Your medical identity, modernized.
 
 ---
 
-## 📥 Downloads & Installation
+## Downloads & Installation
 
 > **Note:** This app is not yet available on the App Store or Play Store. You must install it manually.
 
@@ -106,7 +106,7 @@ Your medical identity, modernized.
 3.  Allow "Install from Unknown Sources" if prompted.
 
 ### **iOS (IPA) - Unsigned**
-> ⚠️ **Important:** The IPA file is **unsigned** (due to Apple restrictions). You cannot install it directly.
+>  **Important:** The IPA file is **unsigned** (due to Apple restrictions). You cannot install it directly.
 
 **How to Install:**
 1.  Download the **`ios_app.ipa`** file.
@@ -118,7 +118,7 @@ Your medical identity, modernized.
 
 ---
 
-## � Installation Guide
+## Installation Guide
 
 1.  **Prerequisites**:
     *   Flutter SDK installed (v3.0+)
@@ -147,7 +147,7 @@ Your medical identity, modernized.
 
 ---
 
-## � Roadmap
+## Roadmap
 *   [ ] integration with WearOS / Apple Watch.
 *   [ ] Blockchain-based medical record storage.
 
