@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lucide_icons/lucide_icons.dart';
-import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
-import 'package:my_sejahtera_ng/core/widgets/glass_container.dart';
-import 'package:my_sejahtera_ng/features/auth/screens/login_screen.dart';
+import 'package:my_sejahtera_ng/features/dashboard/screens/dashboard_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:intl/intl.dart';
 
@@ -70,11 +67,17 @@ class _VaccineSetupScreenState extends ConsumerState<VaccineSetupScreen> {
             'status': 'Completed',
           };
           await supabase.from('vaccine_records').insert(data);
+          
+          if (mounted) {
+             _finishSetup();
+          }
         } else {
           // In case user hasn't generated a session yet due to email confirm
-          ScaffoldMessenger.of(context).showSnackBar(
-             const SnackBar(content: Text("Cannot save records until email is confirmed and you are logged in."))
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+               const SnackBar(content: Text("Cannot save records until email is confirmed and you are logged in."))
+            );
+          }
         }
 
         if (mounted) {
@@ -93,11 +96,11 @@ class _VaccineSetupScreenState extends ConsumerState<VaccineSetupScreen> {
   void _finishSetup() {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      MaterialPageRoute(builder: (context) => const DashboardScreen()),
       (route) => false,
     );
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Setup complete! You can now login.")),
+      const SnackBar(content: Text("Setup complete! Welcome to MySejahtera.")),
     );
   }
 
