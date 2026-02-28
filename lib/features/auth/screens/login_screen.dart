@@ -13,6 +13,7 @@ import 'package:my_sejahtera_ng/features/vaccine/screens/vaccine_setup_screen.da
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:my_sejahtera_ng/core/utils/ui_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'dart:async';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -25,6 +26,67 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
+  late final StreamSubscription<AuthState> _authSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen for Deep Links (Email Verification)
+    _authSubscription = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      final AuthChangeEvent event = data.event;
+      if (event == AuthChangeEvent.signedIn) {
+        // Automatically route user upon email verification deep link
+        if (mounted && Navigator.canPop(context) == false) {
+           ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Email verified! Logging you in automatically..."),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _handleLoginSuccess();
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSubscription.cancel();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleLoginSuccess() async {
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user != null && mounted) {
+      try {
+        final records = await Supabase.instance.client
+            .from('vaccine_records')
+            .select()
+            .eq('user_id', user.id);
+            
+        if (records.isEmpty) {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const VaccineSetupScreen()),
+          );
+        } else {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const DashboardScreen()),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+           Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const DashboardScreen()),
+          );
+        }
+      }
+    }
+  }
 
   void _handleLogin() async {
     // Basic validation
@@ -50,37 +112,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
       if (!mounted) return;
 
-      // Check if user has vaccine records
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user != null) {
-        final records = await Supabase.instance.client
-            .from('vaccine_records')
-            .select()
-            .eq('user_id', user.id);
-            
-        if (!mounted) return;
-        
-        if (records.isEmpty) {
-          // First time login - no records exist
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const VaccineSetupScreen()),
-          );
-          return;
-        }
-      }
-
-      // Proceed to Dashboard
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (_, __, ___) => const DashboardScreen(),
-          transitionsBuilder: (_, animation, __, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-          transitionDuration: const Duration(milliseconds: 800),
-        ),
-      );
+      await _handleLoginSuccess();
+      
     } catch (e) {
       if (!mounted) return;
       final errorMsg = e.toString();
