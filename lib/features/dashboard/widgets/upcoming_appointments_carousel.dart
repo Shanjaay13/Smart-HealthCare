@@ -41,7 +41,7 @@ class _UpcomingAppointmentsCarouselState extends ConsumerState<UpcomingAppointme
       child: Column(
         children: [
           SizedBox(
-            height: 280,
+            height: 320,
             child: PageView.builder(
               controller: _controller,
               itemCount: appointments.length,
