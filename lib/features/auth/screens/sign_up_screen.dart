@@ -56,14 +56,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
         showElegantSuccessDialog(
           context,
-          title: "Setup Vaccine Profile",
-          message: "Your account has been created! Would you like to set up your digital vaccine certificate now?",
-          buttonText: "Continue",
+          title: "Registration Successful!",
+          message: "Your account has been created. A verification link has been sent to your email. Please verify your email before logging in.",
+          buttonText: "Go to Login",
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const VaccineSetupScreen()),
-            );
+            Navigator.pop(context); // Close dialog
+            Navigator.pop(context); // Go back to login screen
           },
         );
         

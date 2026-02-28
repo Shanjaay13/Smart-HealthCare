@@ -9,6 +9,8 @@ import 'package:my_sejahtera_ng/core/widgets/holo_id_card.dart';
 import 'package:my_sejahtera_ng/features/auth/screens/sign_up_screen.dart';
 import 'package:my_sejahtera_ng/features/dashboard/screens/dashboard_screen.dart';
 import 'package:my_sejahtera_ng/features/auth/screens/forgot_password_screen.dart';
+import 'package:my_sejahtera_ng/features/vaccine/screens/vaccine_setup_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:my_sejahtera_ng/core/utils/ui_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -47,6 +49,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           );
 
       if (!mounted) return;
+
+      // Check if user has vaccine records
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user != null) {
+        final records = await Supabase.instance.client
+            .from('vaccine_records')
+            .select()
+            .eq('user_id', user.id);
+            
+        if (!mounted) return;
+        
+        if (records.isEmpty) {
+          // First time login - no records exist
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const VaccineSetupScreen()),
+          );
+          return;
+        }
+      }
 
       // Proceed to Dashboard
       Navigator.pushReplacement(
