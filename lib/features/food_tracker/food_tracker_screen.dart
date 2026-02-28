@@ -187,7 +187,7 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
       children: state.foods.map((food) {
         return Dismissible(
           key: Key('food_${food.id}'),
-          direction: DismissibleDirection.endToStart,
+          direction: DismissDirection.endToStart,
           background: Container(
             alignment: Alignment.centerRight,
             padding: const EdgeInsets.only(right: 20),

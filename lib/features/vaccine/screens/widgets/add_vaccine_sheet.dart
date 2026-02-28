@@ -173,7 +173,7 @@ class _AddVaccineSheetState extends ConsumerState<AddVaccineSheet> {
                   ],
                 ),
                 const SizedBox(height: 15),
-                _buildTextField("Batch Number", LucideIcons.barcode, _batchController),
+                _buildTextField("Batch Number", LucideIcons.tag, _batchController),
                 const SizedBox(height: 15),
                 _buildTextField("Location Given", LucideIcons.mapPin, _locationController),
                 const SizedBox(height: 15),
