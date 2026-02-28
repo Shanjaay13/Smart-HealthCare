@@ -2195,9 +2195,42 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                          },
                          trailing: IconButton(
                            icon: const Icon(LucideIcons.trash2, color: Colors.white24, size: 16),
-                           onPressed: () async {
-                              await ref.read(chatProvider.notifier).deleteSession(session.id);
-                              setState(() {}); // Refresh drawer
+                           onPressed: () {
+                             showDialog(
+                               context: context,
+                               builder: (ctx) => AlertDialog(
+                                 backgroundColor: const Color(0xFF161B1E),
+                                 title: Row(
+                                   children: [
+                                     const Icon(LucideIcons.alertTriangle, color: Colors.redAccent),
+                                     const SizedBox(width: 10),
+                                     const Text("Delete Chat", style: TextStyle(color: Colors.white)),
+                                   ],
+                                 ),
+                                 content: const Text(
+                                   "Are you sure you want to delete this chat session? This action cannot be undone.",
+                                   style: TextStyle(color: Colors.white70),
+                                 ),
+                                 actions: [
+                                   TextButton(
+                                     onPressed: () => Navigator.pop(ctx),
+                                     child: const Text("CANCEL", style: TextStyle(color: Colors.white54)),
+                                   ),
+                                   ElevatedButton(
+                                     style: ElevatedButton.styleFrom(
+                                       backgroundColor: Colors.redAccent,
+                                       foregroundColor: Colors.white,
+                                     ),
+                                     onPressed: () async {
+                                        Navigator.pop(ctx);
+                                        await ref.read(chatProvider.notifier).deleteSession(session.id);
+                                        if (mounted) setState(() {}); // Refresh drawer
+                                     },
+                                     child: const Text("DELETE"),
+                                   ),
+                                 ],
+                               ),
+                             );
                            },
                          ),
                        );

@@ -7,6 +7,7 @@ import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
 import 'package:my_sejahtera_ng/core/widgets/glass_container.dart';
 import 'package:my_sejahtera_ng/core/utils/ui_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:my_sejahtera_ng/features/vaccine/screens/vaccine_setup_screen.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
@@ -55,10 +56,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
         showElegantSuccessDialog(
           context,
-          title: "Welcome Aboard!",
-          message: "Your account has been created successfully. You can now login.",
-          buttonText: "Login Now",
-          onPressed: () => Navigator.pop(context),
+          title: "Setup Vaccine Profile",
+          message: "Your account has been created! Would you like to set up your digital vaccine certificate now?",
+          buttonText: "Continue",
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const VaccineSetupScreen()),
+            );
+          },
         );
         
       } catch (e) {

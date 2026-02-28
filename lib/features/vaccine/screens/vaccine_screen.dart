@@ -4,6 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:my_sejahtera_ng/core/widgets/glass_container.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:my_sejahtera_ng/features/vaccine/screens/widgets/digital_cert_card.dart';
+import 'package:my_sejahtera_ng/features/vaccine/screens/widgets/add_vaccine_sheet.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:my_sejahtera_ng/core/providers/user_provider.dart';
 import 'package:my_sejahtera_ng/features/vaccine/services/pdf_service.dart';
@@ -66,6 +67,20 @@ class _VaccineScreenState extends ConsumerState<VaccineScreen> {
             onPressed: () {},
           )
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => AddVaccineSheet(
+              onSaved: _fetchVaccineRecords,
+            ),
+          );
+        },
+        backgroundColor: Colors.blueAccent,
+        child: const Icon(LucideIcons.plus, color: Colors.white),
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -205,12 +220,25 @@ class _VaccineScreenState extends ConsumerState<VaccineScreen> {
                         separatorBuilder: (_, __) => const Divider(color: Colors.white10, height: 30),
                         itemBuilder: (context, index) {
                           final record = _vaccineRecords[index];
-                          return _buildDoseItem(
-                            record['dose_number'].toString(),
-                            record['vaccine_name'] ?? 'Unknown',
-                            DateFormat('dd MMM yyyy').format(DateTime.parse(record['date_administered'])),
-                            record['location'] ?? 'Unknown Location',
-                            record['batch_number'] ?? '-',
+                          return InkWell(
+                            onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: Colors.transparent,
+                                builder: (context) => AddVaccineSheet(
+                                  initialRecord: record,
+                                  onSaved: _fetchVaccineRecords,
+                                ),
+                              );
+                            },
+                            child: _buildDoseItem(
+                              record['dose_number'].toString(),
+                              record['vaccine_name'] ?? 'Unknown',
+                              DateFormat('dd MMM yyyy').format(DateTime.parse(record['date_administered'])),
+                              record['location'] ?? 'Unknown Location',
+                              record['batch_number'] ?? '-',
+                            ),
                           );
                         },
                       ),
