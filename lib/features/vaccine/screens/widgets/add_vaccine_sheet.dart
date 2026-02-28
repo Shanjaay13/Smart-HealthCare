@@ -131,7 +131,6 @@ class _AddVaccineSheetState extends ConsumerState<AddVaccineSheet> {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFF161B1E),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         border: Border.all(color: Colors.white10),
       ),

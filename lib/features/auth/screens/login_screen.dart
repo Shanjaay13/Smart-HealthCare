@@ -47,6 +47,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         }
       }
     });
+
+    // Check if the link already verified the user before this screen fully launched
+    if (Supabase.instance.client.auth.currentSession != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _handleLoginSuccess();
+      });
+    }
   }
 
   @override
