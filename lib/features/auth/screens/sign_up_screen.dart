@@ -26,13 +26,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final _securityAnswerController = TextEditingController();
 
   final List<String> _securityQuestions = [
-    "What is your favorite pet's name?",
-    "What is your mother's maiden name?",
-    "What city were you born in?",
-    "What was the name of your first school?",
-    "What is your favorite food?",
+    "What is your favorite local food (e.g. Nasi Lemak)?",
+    "Where did you go for primary school?",
+    "What is your childhood nickname?",
+    "In what city did your parents meet?",
+    "What is the name of your first pet?",
   ];
-  String _selectedSecurityQuestion = "What is your favorite pet's name?";
+  String _selectedSecurityQuestion = "What is your favorite local food (e.g. Nasi Lemak)?";
 
   bool _isLoading = false;
 
@@ -144,6 +144,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       value: _selectedSecurityQuestion,
                       dropdownColor: const Color(0xFF161B1E),
                       style: const TextStyle(color: Colors.white),
+                      isExpanded: true, // Prevents text overflow
                       decoration: InputDecoration(
                         labelText: "Security Question",
                         labelStyle: const TextStyle(color: Colors.white70),
