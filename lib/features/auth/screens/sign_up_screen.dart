@@ -60,7 +60,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           message: "Your account has been created. A verification link has been sent to your email. Please verify your email before logging in.",
           buttonText: "Go to Login",
           onPressed: () {
-            Navigator.pop(context); // Close dialog
             Navigator.pop(context); // Go back to login screen
           },
         );

@@ -106,7 +106,7 @@ String getFriendlyErrorMessage(Object error) {
   if (raw.contains("AuthWeakPasswordException")) {
     return "Your password is too weak. Please use at least 6 characters.";
   }
-  if (raw.contains("User already registered")) {
+  if (raw.contains("User already registered") || raw.contains("already exists")) {
     return "An account with this email already exists. Please login instead.";
   }
   if (raw.contains("Invalid login credentials")) {
