@@ -9,8 +9,15 @@ import 'package:my_sejahtera_ng/core/utils/ui_utils.dart';
 
 class AddMedicationSheet extends StatefulWidget {
   final Future<void> Function(Medication) onSave;
+  final Medication? initialData; // Added for editing
+  final Future<void> Function()? onDelete; // Optional delete action
 
-  const AddMedicationSheet({super.key, required this.onSave});
+  const AddMedicationSheet({
+    super.key, 
+    required this.onSave, 
+    this.initialData,
+    this.onDelete,
+  });
 
   @override
   State<AddMedicationSheet> createState() => _AddMedicationSheetState();
@@ -18,15 +25,30 @@ class AddMedicationSheet extends StatefulWidget {
 
 class _AddMedicationSheetState extends State<AddMedicationSheet> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _dosageController = TextEditingController();
-  final _pillsController = TextEditingController();
-  final _instructionsController = TextEditingController();
+  late final TextEditingController _nameController;
+  late final TextEditingController _dosageController;
+  late final TextEditingController _pillsController;
+  late final TextEditingController _instructionsController;
   
-  // New: Timer Mode State
+  // Custom Timer State
   bool _isTimerMode = false;
   DateTime _selectedTime = DateTime.now();
   int _selectedDurationMinutes = 5; // Default 5 mins
+
+  @override
+  void initState() {
+    super.initState();
+    final init = widget.initialData;
+    _nameController = TextEditingController(text: init?.name ?? '');
+    _dosageController = TextEditingController(text: init?.dosage ?? '');
+    _pillsController = TextEditingController(text: init?.pillsToTake.toString() ?? '');
+    _instructionsController = TextEditingController(text: init?.instructions ?? '');
+    
+    if (init != null) {
+      _selectedTime = init.time;
+      _isTimerMode = init.isOneTime;
+    }
+  }
 
   @override
   void dispose() {
@@ -105,17 +127,30 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                 ),
               ),
               const SizedBox(height: 20),
-              Text(
-                "Add Medication",
-                style: GoogleFonts.outfit(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ).animate().fadeIn().slideY(begin: 0.3),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.initialData == null ? "Add Medication" : "Edit Medication",
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ).animate().fadeIn().slideY(begin: 0.3),
+                  if (widget.onDelete != null)
+                    IconButton(
+                      icon: const Icon(LucideIcons.trash2, color: Colors.redAccent),
+                      onPressed: () async {
+                        await widget.onDelete!();
+                        if (context.mounted) Navigator.pop(context);
+                      },
+                    ),
+                ],
+              ),
               const SizedBox(height: 5),
               Text(
-                "Set reminders to stay on track.",
+                widget.initialData == null ? "Set reminders to stay on track." : "Update your medication details.",
                 style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 14),
               ).animate().fadeIn().slideY(begin: 0.3, delay: 100.ms),
               const SizedBox(height: 30),
@@ -238,16 +273,19 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                             finalTime = DateTime.now().add(Duration(minutes: _selectedDurationMinutes));
                           }
                           
-                          final medication = Medication(
+                          final Medication medToSave;
+                          medToSave = Medication(
+                            id: widget.initialData?.id,
                             name: _nameController.text.isEmpty ? "Quick Timer" : _nameController.text,
                             dosage: _dosageController.text.isEmpty ? "General" : _dosageController.text,
                             pillsToTake: int.tryParse(_pillsController.text) ?? 1,
                             time: finalTime,
-                            instructions: "${_instructionsController.text}${_isTimerMode ? ' (Timer set at ${DateFormat.jm().format(DateTime.now())})' : ''}",
+                            instructions: _instructionsController.text, // Simplified
                             isOneTime: _isTimerMode,
+                            isTaken: widget.initialData?.isTaken ?? false, // Preserve taken state
                           );
                           
-                          await widget.onSave(medication); // Await the save operation
+                          await widget.onSave(medToSave); // Await the save operation
                           
                           if (!context.mounted) return;
                           

@@ -100,6 +100,11 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                   Container(key: _hydrationKey, child: _buildHydrationPanel(state)),
                   const SizedBox(height: 25),
 
+                  _sectionHeader("TODAY'S LOGS"),
+                  const SizedBox(height: 10),
+                  _buildFoodLogList(context, ref, state),
+                  const SizedBox(height: 25),
+
                   _sectionHeader("AI HEALTH INSIGHTS"),
                   const SizedBox(height: 10),
                   _buildDynamicInsights(state),
@@ -163,6 +168,89 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
             color: Colors.cyanAccent,
             minHeight: 6,
             borderRadius: BorderRadius.circular(3),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFoodLogList(BuildContext context, WidgetRef ref, FoodTrackerState state) {
+    if (state.foods.isEmpty) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(15)),
+        child: const Center(child: Text("No food logged today.", style: TextStyle(color: Colors.white54))),
+      );
+    }
+
+    return Column(
+      children: state.foods.map((food) {
+        return Dismissible(
+          key: Key('food_${food.id}'),
+          direction: DismissibleDirection.endToStart,
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(15)),
+            child: const Icon(LucideIcons.trash2, color: Colors.white),
+          ),
+          onDismissed: (_) {
+            if (food.id != null) {
+              ref.read(foodTrackerProvider.notifier).deleteFood(food.id!);
+            }
+          },
+          child: GestureDetector(
+            onTap: () => _showEditFoodDialog(context, ref, food),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(15)),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.utensils, color: Colors.orangeAccent, size: 20),
+                  const SizedBox(width: 15),
+                  Expanded(child: Text(food.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                  Text("${food.calories} kcal", style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.w600)),
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  void _showEditFoodDialog(BuildContext context, WidgetRef ref, FoodEntry food) {
+    if (food.id == null) return;
+    final nameCtrl = TextEditingController(text: food.name);
+    final calCtrl = TextEditingController(text: food.calories.toString());
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF161B1E),
+        title: const Text("Edit Food", style: TextStyle(color: Colors.white)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(controller: nameCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Name", labelStyle: TextStyle(color: Colors.white54))),
+            const SizedBox(height: 15),
+            TextField(controller: calCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Calories", labelStyle: TextStyle(color: Colors.white54))),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel")),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.cyanAccent, foregroundColor: Colors.black),
+            onPressed: () {
+              final newName = nameCtrl.text.trim();
+              final newCal = int.tryParse(calCtrl.text) ?? food.calories;
+              if (newName.isNotEmpty && newCal > 0) {
+                ref.read(foodTrackerProvider.notifier).updateFood(food.id!, newName, newCal);
+                Navigator.pop(ctx);
+              }
+            },
+            child: const Text("Save"),
           ),
         ],
       ),

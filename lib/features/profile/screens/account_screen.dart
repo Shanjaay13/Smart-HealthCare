@@ -203,6 +203,18 @@ class AccountScreen extends ConsumerWidget {
                           child: const Text("Log Out"),
                         ),
                       ),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: () => _showDeleteConfirmDialog(context, ref),
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.redAccent),
+                            foregroundColor: Colors.redAccent,
+                          ),
+                          child: const Text("Delete Account"),
+                        ),
+                      ),
                     ],
                   ),
           ),
@@ -282,6 +294,43 @@ class AccountScreen extends ConsumerWidget {
               }
             },
             child: const Text("Save"),
+          ),
+        ],
+      ),
+    );
+  }
+  void _showDeleteConfirmDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF1E1E1E),
+        title: const Text("Delete Account", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+        content: const Text("Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed.", style: TextStyle(color: Colors.white)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel", style: TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            onPressed: () async {
+               Navigator.pop(context); // Close dialog
+               // Show loading indicator or handle it in UI
+               try {
+                 await ref.read(userProvider.notifier).deleteAccount();
+                 if (context.mounted) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                      (Route<dynamic> route) => false,
+                    );
+                 }
+               } catch (e) {
+                  if (context.mounted) {
+                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to delete account: $e")));
+                  }
+               }
+            },
+            child: const Text("Delete permanently"),
           ),
         ],
       ),

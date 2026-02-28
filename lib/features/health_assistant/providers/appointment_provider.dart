@@ -195,6 +195,36 @@ class AppointmentNotifier extends Notifier<AppointmentState> {
     }
   }
 
+  Future<void> updateAppointmentTime(String id, DateTime newTime) async {
+    try {
+      final response = await _supabase
+          .from('appointments')
+          .update({'appointment_time': newTime.toIso8601String()})
+          .eq('id', id)
+          .select()
+          .single();
+
+      final updatedAppointments = state.appointments.map((a) {
+        if (a.id == id) {
+          return Appointment(
+            id: a.id,
+            doctorName: a.doctorName,
+            hospitalName: a.hospitalName,
+            dateTime: newTime,
+            type: a.type,
+            price: a.price,
+            notes: a.notes,
+          );
+        }
+        return a;
+      }).toList();
+
+      state = state.copyWith(appointments: updatedAppointments);
+    } catch (e) {
+      debugPrint("Error updating appointment: $e");
+    }
+  }
+
   void cancelBooking() {
     state = state.copyWith(
       isBooking: false,

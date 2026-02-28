@@ -189,6 +189,17 @@ class UserNotifier extends Notifier<UserSession?> {
     await _supabase.auth.signOut();
   }
 
+  Future<void> deleteAccount() async {
+    try {
+      await _supabase.rpc('delete_user_account');
+      await _supabase.auth.signOut();
+      state = null;
+    } catch (e) {
+      debugPrint("Delete Account Error: $e");
+      rethrow;
+    }
+  }
+
   Future<void> updateMedicalInfo({String? blood, String? allergy, String? contact, String? condition}) async {
     if (state == null) return;
 

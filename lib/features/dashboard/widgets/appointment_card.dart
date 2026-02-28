@@ -113,7 +113,28 @@ class AppointmentCard extends ConsumerWidget {
                   ),
                    // Action Buttons Row
                    Column(
+                     crossAxisAlignment: CrossAxisAlignment.end,
                      children: [
+                       TextButton(
+                         onPressed: () => _editTime(context, ref),
+                         style: TextButton.styleFrom(
+                           backgroundColor: Colors.blueAccent.withOpacity(0.1),
+                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                           shape: RoundedRectangleBorder(
+                             borderRadius: BorderRadius.circular(12),
+                             side: BorderSide(color: Colors.blueAccent.withOpacity(0.3)),
+                           ),
+                         ),
+                         child: Text(
+                           "Edit Time",
+                           style: GoogleFonts.outfit(
+                             color: Colors.blueAccent,
+                             fontWeight: FontWeight.bold,
+                             fontSize: 12,
+                           ),
+                         ),
+                       ),
+                       const SizedBox(height: 8),
                        TextButton(
                          onPressed: () => _confirmCancel(context, ref),
                          style: TextButton.styleFrom(
@@ -190,6 +211,37 @@ class AppointmentCard extends ConsumerWidget {
         ],
       )
     );
+  }
+
+  Future<void> _editTime(BuildContext context, WidgetRef ref) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: appointment.dateTime,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+
+    if (pickedDate != null && context.mounted) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.fromDateTime(appointment.dateTime),
+      );
+
+      if (pickedTime != null && context.mounted) {
+        final newDateTime = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+
+        ref.read(appointmentProvider.notifier).updateAppointmentTime(appointment.id, newDateTime);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Appointment rescheduled successfully."))
+        );
+      }
+    }
   }
 
   Widget _buildInfoColumn(String label, String value, IconData icon) {

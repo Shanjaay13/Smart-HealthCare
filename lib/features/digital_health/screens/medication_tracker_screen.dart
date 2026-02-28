@@ -233,40 +233,55 @@ class _MedicationTrackerScreenState extends ConsumerState<MedicationTrackerScree
       child: GlassContainer(
         color: med.isTaken ? Colors.green.withValues(alpha: 0.3) : Colors.black.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        child: ListTile(
-          leading: Icon(LucideIcons.tablets, color: med.isTaken ? Colors.white70 : Colors.white),
-          title: Text(
-              med.name, 
-              style: TextStyle(
-                  color: Colors.white, 
-                  fontWeight: FontWeight.bold,
-                  decoration: med.isTaken ? TextDecoration.lineThrough : null
-              )
-          ),
-          subtitle: Text(
-              "${med.dosage} • Take ${med.pillsToTake}", 
-              style: const TextStyle(color: Colors.white70)
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-                Text(DateFormat.jm().format(med.time), style: const TextStyle(color: Colors.white)),
-                const SizedBox(width: 8),
-                IconButton(
-                    icon: Icon(
-                        med.isTaken ? Icons.check_circle : Icons.circle_outlined,
-                        color: med.isTaken ? Colors.white : Colors.white70,
-                    ),
-                    onPressed: () {
-                         if (med.id != null) {
-                             ref.read(medicationProvider.notifier).toggleMedication(med.id!);
-                         }
-                         if (!med.isTaken) {
-                            ref.read(userProgressProvider.notifier).completeQuest('meds');
-                         }
-                    },
+        child: InkWell(
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) => AddMedicationSheet(
+                initialData: med,
+                onSave: (updatedMed) => ref.read(medicationProvider.notifier).updateMedication(updatedMed),
+                onDelete: med.id != null ? () => ref.read(medicationProvider.notifier).deleteMedication(med.id!) : null,
+              ),
+            );
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: ListTile(
+            leading: Icon(LucideIcons.tablets, color: med.isTaken ? Colors.white70 : Colors.white),
+            title: Text(
+                med.name, 
+                style: TextStyle(
+                    color: Colors.white, 
+                    fontWeight: FontWeight.bold,
+                    decoration: med.isTaken ? TextDecoration.lineThrough : null
                 )
-            ],
+            ),
+            subtitle: Text(
+                "${med.dosage} • Take ${med.pillsToTake}", 
+                style: const TextStyle(color: Colors.white70)
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                  Text(DateFormat.jm().format(med.time), style: const TextStyle(color: Colors.white)),
+                  const SizedBox(width: 8),
+                  IconButton(
+                      icon: Icon(
+                          med.isTaken ? Icons.check_circle : Icons.circle_outlined,
+                          color: med.isTaken ? Colors.white : Colors.white70,
+                      ),
+                      onPressed: () {
+                           if (med.id != null) {
+                               ref.read(medicationProvider.notifier).toggleMedication(med.id!);
+                           }
+                           if (!med.isTaken) {
+                              ref.read(userProgressProvider.notifier).completeQuest('meds');
+                           }
+                      },
+                  )
+              ],
+            ),
           ),
         ),
       ).animate().fadeIn().slideX(),

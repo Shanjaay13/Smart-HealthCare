@@ -104,6 +104,37 @@ class MedicationNotifier extends StateNotifier<MedicationState> {
       state = oldState; // Revert on error
     }
   }
+
+  Future<void> deleteMedication(int id) async {
+    try {
+      await _supabase.from('medications').delete().eq('id', id);
+      state = state.copyWith(
+        medications: state.medications.where((m) => m.id != id).toList()
+      );
+      // We would also cancel scheduled notifications here using _notificationService
+    } catch (e) {
+      debugPrint("Error deleting medication: $e");
+    }
+  }
+
+  Future<void> updateMedication(Medication updatedMedication) async {
+    if (updatedMedication.id == null) return;
+    try {
+      final response = await _supabase.from('medications').update(
+        updatedMedication.toMap()
+      ).eq('id', updatedMedication.id!).select().single();
+
+      final editedMedication = Medication.fromMap(response);
+
+      state = state.copyWith(
+        medications: state.medications.map((m) => m.id == editedMedication.id ? editedMedication : m).toList()
+      );
+      
+      // We would reschedule notification here using _notificationService based on updated data
+    } catch (e) {
+      debugPrint("Error updating medication: $e");
+    }
+  }
 }
 
 final medicationProvider = StateNotifierProvider<MedicationNotifier, MedicationState>((ref) {

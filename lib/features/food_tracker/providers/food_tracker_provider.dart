@@ -17,12 +17,14 @@ class FoodEntry {
   final String name;
   final int calories;
   final DrinkType? type;
+  final DateTime? createdAt;
   
   FoodEntry({
     this.id,
     required this.name, 
     required this.calories, 
-    this.type
+    this.type,
+    this.createdAt,
   });
 
   Map<String, dynamic> toMap() {
@@ -49,6 +51,7 @@ class FoodEntry {
       name: map['name'],
       calories: map['calories'],
       type: dType,
+      createdAt: map['created_at'] != null ? DateTime.parse(map['created_at']) : null,
     );
   }
 }
@@ -126,23 +129,42 @@ class FoodTrackerNotifier extends StateNotifier<FoodTrackerState> {
       final user = _supabase.auth.currentUser;
       if (user == null) return;
 
-      final startOfDay = DateTime.now().copyWith(hour: 0, minute: 0, second: 0);
-      final endOfDay = DateTime.now().copyWith(hour: 23, minute: 59, second: 59);
+      final today = DateTime.now().copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
+      final sevenDaysAgo = today.subtract(const Duration(days: 6)); 
+      final endOfToday = today.copyWith(hour: 23, minute: 59, second: 59);
 
+      // Fetch logs for the past 7 days
       final response = await _supabase
           .from('food_logs')
           .select()
           .eq('user_id', user.id)
-          .gte('created_at', startOfDay.toIso8601String())
-          .lte('created_at', endOfDay.toIso8601String());
+          .gte('created_at', sevenDaysAgo.toIso8601String())
+          .lte('created_at', endOfToday.toIso8601String());
 
       final logs = (response as List).map((e) => FoodEntry.fromMap(e)).toList();
       
+      final String todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      
+      // Separate today's logs for state
+      final todaysLogs = logs.where((log) {
+        if (log.createdAt == null) return false;
+        return DateFormat('yyyy-MM-dd').format(log.createdAt!) == todayKey;
+      }).toList();
+      
+      // Build 7-day history map
+      Map<String, int> history = {};
+      for (var log in logs) {
+        if (log.createdAt != null && log.type == null) { // Only count food calories, not water
+          final dateKey = DateFormat('yyyy-MM-dd').format(log.createdAt!);
+          history[dateKey] = (history[dateKey] ?? 0) + log.calories;
+        }
+      }
+
       state = state.copyWith(
-        foods: logs.where((e) => e.type == null).toList(),
-        drinks: logs.where((e) => e.type != null).toList(),
+        foods: todaysLogs.where((e) => e.type == null).toList(),
+        drinks: todaysLogs.where((e) => e.type != null).toList(),
+        dailyHistory: history,
       );
-      _updateHistory();
     } catch (e) {
       debugPrint("Error loading food logs: $e");
     }
@@ -206,6 +228,33 @@ class FoodTrackerNotifier extends StateNotifier<FoodTrackerState> {
     final history = Map<String, int>.from(state.dailyHistory);
     history[_todayKey] = state.totalCalories;
     state = state.copyWith(dailyHistory: history);
+  }
+
+  Future<void> deleteFood(int id) async {
+    try {
+      await _supabase.from('food_logs').delete().eq('id', id);
+      state = state.copyWith(foods: state.foods.where((f) => f.id != id).toList());
+      _updateHistory();
+    } catch (e) {
+      debugPrint("Error deleting food: $e");
+    }
+  }
+
+  Future<void> updateFood(int id, String newName, int newCal) async {
+    try {
+      final response = await _supabase.from('food_logs').update({
+        'name': newName,
+        'calories': newCal,
+      }).eq('id', id).select().single();
+      
+      final updatedEntry = FoodEntry.fromMap(response);
+      state = state.copyWith(
+        foods: state.foods.map((f) => f.id == id ? updatedEntry : f).toList()
+      );
+      _updateHistory();
+    } catch (e) {
+      debugPrint("Error updating food: $e");
+    }
   }
 
   Future<void> addFood(String name, int cal) async {
