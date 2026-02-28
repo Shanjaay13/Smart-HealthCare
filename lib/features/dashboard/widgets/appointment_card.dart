@@ -215,32 +215,48 @@ class AppointmentCard extends ConsumerWidget {
   }
 
   Future<void> _editTime(BuildContext context, WidgetRef ref) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: appointment.dateTime,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
+    try {
+      final now = DateTime.now();
+      // Ensure initialDate is not before firstDate
+      final DateTime safeInitialDate = appointment.dateTime.isBefore(now) ? now : appointment.dateTime;
+      final DateTime safeFirstDate = appointment.dateTime.isBefore(now) ? appointment.dateTime : now;
 
-    if (pickedDate != null && context.mounted) {
+      final DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: safeInitialDate,
+        firstDate: safeFirstDate,
+        lastDate: now.add(const Duration(days: 365)),
+      );
+
+      if (pickedDate == null) return;
+
+      if (!context.mounted) return;
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(appointment.dateTime),
       );
 
-      if (pickedTime != null && context.mounted) {
-        final newDateTime = DateTime(
-          pickedDate.year,
-          pickedDate.month,
-          pickedDate.day,
-          pickedTime.hour,
-          pickedTime.minute,
-        );
+      if (pickedTime == null) return;
 
-        ref.read(appointmentProvider.notifier).updateAppointmentTime(appointment.id, newDateTime);
+      final newDateTime = DateTime(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        pickedTime.hour,
+        pickedTime.minute,
+      );
+
+      if (context.mounted) {
+        await ref.read(appointmentProvider.notifier).updateAppointmentTime(appointment.id, newDateTime);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Appointment rescheduled successfully."))
+          const SnackBar(content: Text("Appointment rescheduled successfully.")),
         );
+      }
+    } catch (e) {
+      if (context.mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(content: Text("Error: $e")),
+         );
       }
     }
   }
