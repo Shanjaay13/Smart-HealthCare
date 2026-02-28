@@ -18,7 +18,7 @@ class AppointmentCard extends ConsumerWidget {
       child: GlassContainer(
         borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -55,10 +55,10 @@ class AppointmentCard extends ConsumerWidget {
                             style: GoogleFonts.outfit(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
-                              fontSize: 15,
+                              fontSize: 14,
                             ),
                             maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                            overflow: TextOverflow.visible,
                           ),
                         ),
                       ],
@@ -83,7 +83,7 @@ class AppointmentCard extends ConsumerWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
               
               // Doctor & Hospital
               Row(
@@ -160,7 +160,7 @@ class AppointmentCard extends ConsumerWidget {
                 ],
               ),
               
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               
               // Date & Time Grid
               Container(
@@ -226,6 +226,19 @@ class AppointmentCard extends ConsumerWidget {
         initialDate: safeInitialDate,
         firstDate: safeFirstDate,
         lastDate: now.add(const Duration(days: 365)),
+        builder: (context, child) {
+          return Theme(
+            data: ThemeData.dark().copyWith(
+              colorScheme: const ColorScheme.dark(
+                primary: Colors.blueAccent,
+                onPrimary: Colors.white,
+                surface: Color(0xFF1E293B),
+                onSurface: Colors.white,
+              ),
+            ),
+            child: child!,
+          );
+        },
       );
 
       if (pickedDate == null) return;
@@ -234,6 +247,19 @@ class AppointmentCard extends ConsumerWidget {
       final TimeOfDay? pickedTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.fromDateTime(appointment.dateTime),
+        builder: (context, child) {
+          return Theme(
+            data: ThemeData.dark().copyWith(
+              colorScheme: const ColorScheme.dark(
+                primary: Colors.blueAccent,
+                onPrimary: Colors.white,
+                surface: Color(0xFF1E293B),
+                onSurface: Colors.white,
+              ),
+            ),
+            child: child!,
+          );
+        },
       );
 
       if (pickedTime == null) return;
