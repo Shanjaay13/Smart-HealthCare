@@ -45,11 +45,15 @@ Real-time, hyper-local risk assessment.
 *   **Proximity Radar**: Runs in the background (simulated) to warn you if you enter a "Red Zone".
 *   **Premise Check-In**: A fast, precise QR scanner for contact tracing.
 
-### 4.  Digital Health ID (Holo-ID)
+### 4. Digital Health ID (Holo-ID)
 Your medical identity, modernized.
 *   **Holographic Design**: A secure, animated digital ID card with gyroscope effects.
-*   **Vaccination Passports**: View, download, and share verified PDF vaccine certificates.
-*   **Dependent Management**: seamlessly switch profiles to manage children or elderly parents.
+*   **Vaccination Passports**: View, add, update, and manage verified vaccine certificates.
+*   **Secure Authentication**: Features enterprise-grade Email Verification with deep-linking magic (Universal App Links) to securely log users into their verified digital vault.
+
+### 5. Secure Cloud Synchronization
+*   **Real-time Database**: Profiles, medications, and chat history are securely synchronized across devices using a real-time cloud backend.
+*   **Gamified Progress**: Your XP, levels, and daily quests are securely tracked globally.
 
 ---
 
@@ -81,12 +85,14 @@ Your medical identity, modernized.
 ### **Tech Stack**
 *   **Framework**: Flutter 3.x (Dart)
 *   **State Management**: Riverpod (for reactive, scalable state)
+*   **Backend as a Service**: Supabase (PostgreSQL, Auth, Edge Functions)
 *   **AI Engine**: Custom NLU Logic + Google Gemini integration (via API)
 *   **Services**:
+    *   `supabase_flutter`: Secure authentication, email verification, and real-time database queries.
+    *   `app_links`: Universal mobile deep linking for seamless authentication redirects.
     *   `geolocator`: GPS & Location services.
     *   `flutter_map` & `latlong2`: OpenStreetMaps integration.
-    *   `sqflite`: Local database for persistence.
-    *   `shared_preferences`: User settings storage.
+    *   `shared_preferences`: Local settings storage.
     *   `url_launcher`: External calls and navigation.
 
 ### **Design System**
@@ -137,7 +143,12 @@ Your medical identity, modernized.
     ```
 
 4.  **Configuration (Optional)**:
-    *   Create a `.env` file in the root.
+    *   Create a `.env` file in the root directory.
+    *   Add your Supabase credentials to enable the live backend:
+        ```env
+        SUPABASE_URL=your_project_url
+        SUPABASE_ANON_KEY=your_anon_key
+        ```
     *   Add `GROQ_API_KEY=your_key_here` to enable the real LLM backend.
 
 5.  **Run the App**:
