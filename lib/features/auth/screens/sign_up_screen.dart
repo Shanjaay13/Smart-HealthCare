@@ -66,14 +66,104 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         
       } catch (e) {
         if (!mounted) return;
-        final errorMsg = e.toString();
-        showElegantErrorDialog(
-          context,
-          title: "Registration Failed",
-          message: getFriendlyErrorMessage(e),
-          buttonText: "Try Again",
-          icon: LucideIcons.alertTriangle,
-        );
+        final rawError = e.toString();
+        
+        if (rawError.contains("User already registered") || rawError.contains("already exists")) {
+          showDialog(
+            context: context,
+            builder: (ctx) => Dialog(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              insetPadding: const EdgeInsets.symmetric(horizontal: 20),
+              child: GlassContainer(
+                borderRadius: BorderRadius.circular(20),
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.orangeAccent.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(LucideIcons.userX, color: Colors.orangeAccent, size: 40),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        "Account Exists",
+                        style: GoogleFonts.outfit(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        "An account with this email is already registered. What would you like to do?",
+                        style: GoogleFonts.outfit(
+                          color: Colors.white70,
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.accentTeal,
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(ctx); // Close dialog
+                            Navigator.pop(context); // Go back to Login Screen
+                          },
+                          child: Text(
+                            "Login Instead",
+                            style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white70,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(ctx); // Close dialog
+                            _usernameController.clear();
+                          },
+                          child: Text(
+                            "Use Different Email",
+                            style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        } else {
+          showElegantErrorDialog(
+            context,
+            title: "Registration Failed",
+            message: getFriendlyErrorMessage(e),
+            buttonText: "Try Again",
+            icon: LucideIcons.alertTriangle,
+          );
+        }
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }

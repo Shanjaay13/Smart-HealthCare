@@ -606,6 +606,20 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
       return;
     }
 
+    // 0.5. Guard: Prevent answering random AI questions while in booking flow
+    if (lowerInput.startsWith("what is ") || 
+        lowerInput.startsWith("who is ") || 
+        lowerInput.startsWith("how to ") || 
+        (lowerInput.contains("?") && lowerInput.split(" ").length > 3)) {
+        
+       setState(() => _isLoading = false);
+       ref.read(chatProvider.notifier).addMessage(ChatMessage(
+         text: "It looks like you're asking a question, but we are currently in the middle of booking an appointment! 🏥\n\nPlease enter the required booking info, or type **'cancel'** to stop the booking process so I can answer your question.",
+         isUser: false,
+       ));
+       return;
+    }
+
     // Simulate thinking delay
     setState(() => _isLoading = true);
     Future.delayed(const Duration(milliseconds: 1000), () async {

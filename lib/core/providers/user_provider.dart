@@ -136,7 +136,7 @@ class UserNotifier extends Notifier<UserSession?> {
     required String securityAnswer,
   }) async {
     try {
-      await _supabase.auth.signUp(
+      final response = await _supabase.auth.signUp(
         email: email,
         password: password,
         data: {
@@ -148,6 +148,10 @@ class UserNotifier extends Notifier<UserSession?> {
           'security_answer': securityAnswer,
         },
       );
+
+      if (response.user != null && response.user!.identities != null && response.user!.identities!.isEmpty) {
+        throw Exception("User already registered");
+      }
     } catch (e) {
       debugPrint("Sign Up Error: $e");
       rethrow;
