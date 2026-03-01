@@ -45,9 +45,8 @@ Real-time, hyper-local risk assessment.
 *   **Proximity Radar**: Runs in the background (simulated) to warn you if you enter a "Red Zone".
 *   **Premise Check-In**: A fast, precise QR scanner for contact tracing.
 
-### 4. Digital Health ID (Holo-ID)
+### 4. Digital Health ID
 Your medical identity, modernized.
-*   **Holographic Design**: A secure, animated digital ID card with gyroscope effects.
 *   **Vaccination Passports**: View, add, update, and manage verified vaccine certificates.
 *   **Secure Authentication**: Features enterprise-grade Email Verification with deep-linking magic (Universal App Links) to securely log users into their verified digital vault.
 
