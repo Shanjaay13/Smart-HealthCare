@@ -66,24 +66,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs access to location when open to show nearby hotspots.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>MySejahtera NG needs camera access to scan food items for calorie tracking.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>MySejahtera NG needs photo library access to analyze food photos for calorie tracking.</string>
-	
-	<!-- Deep Linking -->
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>mysejahterang</string>
-			</array>
-		</dict>
-	</array>
 </dict>
 </plist>
