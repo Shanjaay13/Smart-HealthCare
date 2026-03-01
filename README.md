@@ -111,15 +111,28 @@ Your medical identity, modernized.
 3.  Allow "Install from Unknown Sources" if prompted.
 
 ### **iOS (IPA) - Unsigned**
->  **Important:** The IPA file is **unsigned** (due to Apple restrictions). You cannot install it directly.
+>  **Important:** Because Apple heavily restricts app sharing, the `ios_app.ipa` file is **unsigned** and cannot simply be sent over WhatsApp and tapped to install like an Android APK.
 
-**How to Install:**
-1.  Download the **`ios_app.ipa`** file.
-2.  Use a sideloading tool on your PC/Mac:
-    *   **[AltStore](https://altstore.io/)**: (Recommended) Free, requires refreshing every 7 days.
-    *   **[Sideloadly](https://sideloadly.io/)**: Drag & drop installation.
-    *   **Signulous**: Paid service (no computer needed).
-3.  Once installed, go to **Settings -> General -> VPN & Device Management** on your iPhone and "Trust" your Apple ID to open the app.
+**How to Install (Sideloading):**
+Because the app is not on the App Store, you must inject the app into your phone using a computer.
+
+**Method 1: Sideloadly (Easiest - Drag & Drop)**
+1. Download [Sideloadly](https://sideloadly.io/) on your Mac or Windows PC and install iTunes/iCloud (if on Windows).
+2. Connect your iPhone to the computer with a USB cable and tap "Trust This Computer".
+3. Open Sideloadly, drag and drop the `ios_app.ipa` file into the Sideloadly window.
+4. Enter your Apple ID email and click **Start** (it uses your Apple ID to generate a free 7-day development certificate).
+5. Enter your Apple ID password when prompted. The app will be installed on your phone.
+
+**Method 2: AltStore (Best for long-term testing)**
+1. Download [AltServer](https://altstore.io/) to your Mac/PC.
+2. Connect your iPhone and install AltStore to your phone via the AltServer menu.
+3. Open AltStore on your iPhone, go to the "My Apps" tab, click the `+` icon, and select the `ios_app.ipa` file from your phone's files to install it.
+
+**Final Step (Trusting the App)**
+Once the app appears on your iPhone's home screen, Apple will stop you from opening it until you manually trust it:
+* Go to **Settings -> General -> VPN & Device Management** on your iPhone.
+* Tap your Apple ID email under the "Developer App" section.
+* Tap **"Trust"**. You can now open MySejahtera NG!
 
 ---
 
