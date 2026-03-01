@@ -34,7 +34,7 @@ At the heart of MySNG is **Cortex**, an advanced NLU (Natural Language Understan
 ### 2. Quantum Health Dashboard
 A visually stunning, glassmorphic command center for your health data.
 *   **MySejahtera Health Score**: A proprietary algorithm that calculates a daily score (0-100) based on your BMI, sleep patterns, and step count.
-*   **Visual Calorie Tracker**: Snap a photo of your food (simulated) or log it to track intake against your BMR.
+*   **Visual Calorie Tracker**: Snap a photo of your food and let the AI automatically detect the meal and estimate the calories/macros (powered by LLaMA Vision).
 *   **Gamification**:
     *   **XP & Levels**: Earn XP for logging health data, checking in, or completing quizzes.
     *   **Badges**: Unlock achievements like "Early Bird" (Morning check-ins) or "Marathoner" (10k steps).
@@ -86,7 +86,7 @@ Your medical identity, modernized.
 *   **Framework**: Flutter 3.x (Dart)
 *   **State Management**: Riverpod (for reactive, scalable state)
 *   **Backend as a Service**: Supabase (PostgreSQL, Auth, Edge Functions)
-*   **AI Engine**: Custom NLU Logic + Google Gemini integration (via API)
+*   **AI Engine**: Custom NLU Logic + Groq API integration (Powered by LLaMA 3 for Chat and LLaMA Vision / LLaMA 4 for Visual Calorie Tracking)
 *   **Services**:
     *   `supabase_flutter`: Secure authentication, email verification, and real-time database queries.
     *   `app_links`: Universal mobile deep linking for seamless authentication redirects.
