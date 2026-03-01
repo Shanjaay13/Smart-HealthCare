@@ -67,7 +67,6 @@ class _VaccineSetupScreenState extends ConsumerState<VaccineSetupScreen> {
             'location': _locationController.text.trim(),
             'dose_number': int.tryParse(_doseController.text.trim()) ?? 1,
             'date_administered': _selectedDate.toIso8601String().split('T')[0],
-            'status': 'Completed',
           };
           await supabase.from('vaccine_records').insert(data);
           

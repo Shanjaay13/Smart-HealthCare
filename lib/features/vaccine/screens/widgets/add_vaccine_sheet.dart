@@ -81,7 +81,6 @@ class _AddVaccineSheetState extends ConsumerState<AddVaccineSheet> {
           'location': _locationController.text.trim(),
           'dose_number': int.tryParse(_doseController.text.trim()) ?? 1,
           'date_administered': _selectedDate.toIso8601String().split('T')[0],
-          'status': 'Completed',
         };
 
         if (widget.initialRecord == null) {
