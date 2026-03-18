@@ -30,7 +30,7 @@ class AccountScreen extends ConsumerWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [AppTheme.primaryDark, AppTheme.primaryBlue],
+            colors: [AppTheme.primaryBlue, const Color(0xFF0284C7)],
           ),
         ),
         child: SafeArea(
@@ -45,7 +45,7 @@ class AccountScreen extends ConsumerWidget {
                       const CircleAvatar(
                         radius: 50,
                         backgroundColor: AppTheme.accentTeal,
-                        child: Icon(LucideIcons.user, size: 50, color: AppTheme.primaryDark),
+                        child: const Icon(LucideIcons.user, size: 50, color: AppTheme.primaryBlue),
                       ),
                       const SizedBox(height: 15),
                       Text(

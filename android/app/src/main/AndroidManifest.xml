@@ -11,7 +11,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
-        android:label="my_sejahtera_ng"
+        android:label="Smart HealthCare"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity

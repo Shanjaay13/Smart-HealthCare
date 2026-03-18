@@ -23,7 +23,10 @@ class _UpcomingAppointmentsCarouselState extends ConsumerState<UpcomingAppointme
   @override
   Widget build(BuildContext context) {
     final appointmentState = ref.watch(appointmentProvider);
-    final appointments = appointmentState.appointments;
+    final now = DateTime.now();
+    final appointments = appointmentState.appointments
+        .where((a) => a.dateTime.isAfter(now))
+        .toList();
 
     if (appointments.isEmpty) {
       return const SizedBox.shrink();
@@ -41,7 +44,7 @@ class _UpcomingAppointmentsCarouselState extends ConsumerState<UpcomingAppointme
       child: Column(
         children: [
           SizedBox(
-            height: 320,
+            height: 345, // Increased height to prevent pixel overflow
             child: PageView.builder(
               controller: _controller,
               itemCount: appointments.length,

@@ -2,17 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:my_sejahtera_ng/core/widgets/glass_container.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
 
-// Import features and providers
-import 'package:my_sejahtera_ng/features/food_tracker/food_tracker_screen.dart'; // Ensure this matches export
+import 'package:my_sejahtera_ng/features/food_tracker/food_tracker_screen.dart';
 import 'package:my_sejahtera_ng/features/food_tracker/providers/food_tracker_provider.dart';
 import 'package:my_sejahtera_ng/features/digital_health/providers/medication_provider.dart';
 import 'package:my_sejahtera_ng/features/digital_health/providers/vitals_provider.dart';
 import 'package:my_sejahtera_ng/features/digital_health/screens/medication_tracker_screen.dart';
 import 'package:my_sejahtera_ng/features/digital_health/screens/health_vitals_screen.dart';
-import 'package:my_sejahtera_ng/core/providers/user_provider.dart'; // Assuming this exists
+import 'package:my_sejahtera_ng/core/providers/user_provider.dart';
 
 class HealthDashboardScreen extends ConsumerWidget {
   const HealthDashboardScreen({super.key});
@@ -24,236 +23,355 @@ class HealthDashboardScreen extends ConsumerWidget {
     final foodState = ref.watch(foodTrackerProvider);
     final user = ref.watch(userProvider);
     
-    // Calculate Smart Health Score
     int healthScore = 0;
-    
-    // 1. Base Score (Vitals)
     if (vitals.bmiStatus == 'Normal') healthScore += 40;
     else if (vitals.bmiStatus == 'Overweight') healthScore += 30;
     else healthScore += 20;
 
-    // 2. Nutrition Activity (Must log to earn points)
     if (foodState.totalCalories > 0) {
        if (foodState.totalCalories <= foodState.calorieTarget) healthScore += 20;
-       else healthScore += 10; // Overeating is better than starving/not logging?
+       else healthScore += 10;
     }
 
-    // 3. Hydration
     if (foodState.waterCount >= 8) healthScore += 20;
     else if (foodState.waterCount >= 4) healthScore += 10;
 
-    // 4. Medication Compliance
     final totalMeds = medicationState.medications.length;
     final takenMeds = medicationState.medications.where((m) => m.isTaken).length;
-    
     if (totalMeds == 0) {
-       healthScore += 20; // Healthy bonus
+       healthScore += 20; 
     } else {
        double medCompliance = takenMeds / totalMeds;
        healthScore += (20 * medCompliance).toInt();
     }
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      backgroundColor: AppTheme.bgLight,
       appBar: AppBar(
-        title: const Text("My Health Hub"),
-        backgroundColor: Colors.transparent,
+        title: const Text("My Health Hub", style: TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold)),
+        backgroundColor: AppTheme.bgLight,
         elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: AppTheme.textDark),
         actions: [
           IconButton(
-            icon: const Icon(LucideIcons.bellRing, color: Colors.white),
+            icon: const Icon(LucideIcons.bell),
             onPressed: () {},
           ),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-           gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
-           ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header Section
-                Text("Good Morning,", style: GoogleFonts.outfit(color: Colors.white70, fontSize: 16)),
-                Text(user?.fullName ?? "User", style: GoogleFonts.outfit(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 20),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Text("Good Morning,", style: GoogleFonts.outfit(color: AppTheme.textMuted, fontSize: 16)),
+              Text(user?.fullName ?? "User", style: GoogleFonts.outfit(color: AppTheme.textDark, fontSize: 36, fontWeight: FontWeight.w900, letterSpacing: -1)),
+              const SizedBox(height: 30),
 
-                // Health Score Card
-                _buildHealthScoreCard(healthScore),
+              // Hero: Massive Glowing Orb
+              Center(child: _buildHealthOrb(healthScore)),
 
-                const SizedBox(height: 30),
-                Text("Your Trackers", style: GoogleFonts.outfit(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 15),
+              const SizedBox(height: 40),
+              Text("Your Trackers", style: GoogleFonts.outfit(color: AppTheme.textDark, fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: -0.5)),
+              const SizedBox(height: 20),
 
-                // Grid of Trackers
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 15,
-                  mainAxisSpacing: 15,
-                  childAspectRatio: 0.85,
-                  children: [
-                     _buildTrackerCard(
-                       context, 
-                       "Nutrition", 
-                       "${foodState.totalCalories} / ${foodState.calorieTarget}", 
-                       "kcal consumed",
-                       LucideIcons.utensils, 
-                       Colors.orangeAccent,
-                       const FoodTrackerScreen(),
-                       progress: foodState.totalCalories / foodState.calorieTarget,
-                     ),
-                     _buildTrackerCard(
-                       context, 
-                       "Medication", 
-                       totalMeds == 0 ? "No meds" : "$takenMeds / $totalMeds", 
-                       "tablets taken",
-                       LucideIcons.pill, 
-                       Colors.greenAccent,
-                       const MedicationTrackerScreen(),
-                       progress: totalMeds == 0 ? 1.0 : takenMeds / totalMeds,
-                     ),
-                     _buildTrackerCard(
-                       context, 
-                       "Vitals (BMI)", 
-                       vitals.bmi.toStringAsFixed(1), 
-                       vitals.bmiStatus,
-                       LucideIcons.activity, 
-                       Colors.pinkAccent,
-                       const HealthVitalsScreen(),
-                       progress: vitals.bmiStatus == 'Normal' ? 1.0 : 0.6, // Visual indicator
-                     ),
-                     _buildTrackerCard(
-                       context, 
-                       "Hydration", 
-                       "${foodState.waterCount}", 
-                       "glasses",
-                       LucideIcons.droplets, 
-                       Colors.cyanAccent,
-                       const FoodTrackerScreen(autoShowHydration: true), // Links to specific hydration panel
-                       progress: (foodState.waterCount / 8).clamp(0.0, 1.0),
-                     ),
-                  ],
-                ),
-                
-                const SizedBox(height: 30),
-                // Quick Action / Insight
-                _buildInsightCard(vitals.bmiStatus, foodState.totalCalories > foodState.calorieTarget),
-              ],
-            ),
+              // The Organic Bento Box Layout
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Left Column: Wavy banner + Cornered Square
+                  Expanded(
+                    flex: 11,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildNutritionWavyCard(context, foodState),
+                        const SizedBox(height: 16),
+                        _buildVitalsSquircle(context, vitals),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  // Right Column: Tall Capsule + Perfect Circle
+                  Expanded(
+                    flex: 9,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildHydrationCapsule(context, foodState),
+                        const SizedBox(height: 16),
+                        _buildMedicationCircle(context, takenMeds, totalMeds),
+                      ],
+                    ),
+                  )
+                ],
+              ),
+              
+              const SizedBox(height: 40),
+              // Bottom Action Card
+              _buildDailyInsightCard(vitals.bmiStatus, foodState.totalCalories > foodState.calorieTarget),
+              const SizedBox(height: 40),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildHealthScoreCard(int score) {
-    return GlassContainer(
-      borderRadius: BorderRadius.circular(24),
-      padding: const EdgeInsets.all(24),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Overall Health Score", style: GoogleFonts.outfit(color: Colors.white70, fontSize: 14)),
-              const SizedBox(height: 8),
-              Text("$score", style: GoogleFonts.outfit(color: Colors.white, fontSize: 48, fontWeight: FontWeight.bold)),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
-                child: Text(score > 70 ? "Excellent" : "Needs Attention", style: const TextStyle(color: Colors.white)),
-              )
-            ],
+  Widget _buildHealthOrb(int score) {
+    bool isExcellent = score > 70;
+    Color orbColor = isExcellent ? const Color(0xFF10B981) : const Color(0xFFF59E0B);
+    
+    return Container(
+      width: 200,
+      height: 200,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: AppTheme.surfaceWhite,
+        boxShadow: [
+          BoxShadow(
+            color: orbColor.withOpacity(0.2),
+            blurRadius: 40,
+            spreadRadius: 10,
+            offset: const Offset(0, 15)
           ),
-          SizedBox(
-            height: 80,
-            width: 80,
-            child: CircularProgressIndicator(
-              value: score / 100,
-              strokeWidth: 8,
-              backgroundColor: Colors.white10,
-              color: score > 70 ? Colors.greenAccent : Colors.orangeAccent,
-            ),
-          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            spreadRadius: 2,
+            offset: const Offset(0, 5)
+          )
         ],
+        border: Border.all(color: orbColor.withOpacity(0.3), width: 8),
       ),
-    ).animate().fadeIn().slideY();
-  }
-
-  Widget _buildTrackerCard(BuildContext context, String title, String value, String sub, IconData icon, Color color, Widget destination, {double progress = 0.0}) {
-    return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => destination)),
-      child: GlassContainer(
-        padding: const EdgeInsets.all(16),
-        borderRadius: BorderRadius.circular(20),
+      child: Center(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Icon(icon, color: color, size: 24),
-                Icon(LucideIcons.arrowUpRight, color: Colors.white30, size: 16),
-              ],
+            Icon(isExcellent ? LucideIcons.activity : LucideIcons.alertTriangle, color: orbColor, size: 28),
+            const SizedBox(height: 8),
+            Text(
+              "$score",
+              style: GoogleFonts.outfit(color: AppTheme.textDark, fontSize: 64, fontWeight: FontWeight.w900, height: 1.0, letterSpacing: -2),
             ),
-            const Spacer(),
-            Text(title, style: GoogleFonts.outfit(color: Colors.white70, fontSize: 14)),
-            const SizedBox(height: 4),
-            Text(value, style: GoogleFonts.outfit(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-            Text(sub, style: GoogleFonts.outfit(color: Colors.white38, fontSize: 12)),
-            const SizedBox(height: 12),
-            LinearProgressIndicator(
-              value: progress,
-              backgroundColor: Colors.white10,
-              color: color,
-              minHeight: 4,
-              borderRadius: BorderRadius.circular(2),
-            )
+            Text(
+              "HEALTH SCORE",
+              style: GoogleFonts.outfit(color: AppTheme.textMuted, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5),
+            ),
           ],
         ),
       ),
-    ).animate().scale(duration: 400.ms, curve: Curves.easeOut);
+    ).animate()
+     .fadeIn(duration: 800.ms)
+     .scale(begin: const Offset(0.8, 0.8), curve: Curves.easeOutBack)
+     .shimmer(delay: 1000.ms, duration: 2000.ms, color: orbColor.withOpacity(0.2));
   }
 
-  Widget _buildInsightCard(String bmiStatus, bool overCalories) {
-    String message = "You're doing great! Keep maintaining your healthy routine.";
+  Widget _buildNutritionWavyCard(BuildContext context, dynamic foodState) {
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FoodTrackerScreen())),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFEF3C7), // Amber 100
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(40),
+            topRight: Radius.circular(16),
+            bottomLeft: Radius.circular(16),
+            bottomRight: Radius.circular(40),
+          ),
+          boxShadow: [
+            BoxShadow(color: const Color(0xFFF59E0B).withOpacity(0.15), blurRadius: 20, offset: const Offset(0, 8))
+          ]
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: Colors.white.withOpacity(0.6), shape: BoxShape.circle),
+              child: const Icon(LucideIcons.utensils, color: Color(0xFFD97706)),
+            ),
+            const SizedBox(height: 16),
+            Text("${foodState.totalCalories}", style: GoogleFonts.outfit(color: const Color(0xFF92400E), fontSize: 32, fontWeight: FontWeight.w900, height: 1.0)),
+            const SizedBox(height: 4),
+            Text("kcal / ${foodState.calorieTarget}", style: GoogleFonts.outfit(color: const Color(0xFFB45309), fontSize: 13, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.1),
+    );
+  }
+
+  Widget _buildHydrationCapsule(BuildContext context, dynamic foodState) {
+    double fillPercent = (foodState.waterCount / 8).clamp(0.0, 1.0);
+    
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const FoodTrackerScreen(autoShowHydration: true))),
+      child: Container(
+        height: 220,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE0F2FE), // Light Blue
+          borderRadius: BorderRadius.circular(100), // Full pill
+          boxShadow: [
+            BoxShadow(color: const Color(0xFF0EA5E9).withOpacity(0.15), blurRadius: 20, offset: const Offset(0, 8))
+          ]
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              child: const Icon(LucideIcons.droplets, color: Color(0xFF0284C7)),
+            ),
+            const Spacer(),
+            Text("${foodState.waterCount}", style: GoogleFonts.outfit(color: const Color(0xFF0369A1), fontSize: 40, fontWeight: FontWeight.w900, height: 1.0)),
+            const SizedBox(height: 4),
+            Text("glasses", style: GoogleFonts.outfit(color: const Color(0xFF075985), fontSize: 13, fontWeight: FontWeight.bold)),
+            const Spacer(),
+            // Wave progress visual
+            Container(
+              height: 60,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color(0xFF38BDF8).withOpacity(0.3),
+                borderRadius: const BorderRadius.only(bottomLeft: Radius.circular(100), bottomRight: Radius.circular(100)),
+              ),
+              alignment: Alignment.bottomCenter,
+              child: AnimatedContainer(
+                duration: 600.ms,
+                height: 60 * fillPercent,
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF0EA5E9),
+                  borderRadius: BorderRadius.only(bottomLeft: Radius.circular(100), bottomRight: Radius.circular(100)),
+                ),
+              ),
+            )
+          ],
+        ),
+      ).animate().fadeIn(delay: 200.ms).slideX(begin: 0.1),
+    );
+  }
+
+  Widget _buildVitalsSquircle(BuildContext context, dynamic vitals) {
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HealthVitalsScreen())),
+      child: Container(
+        height: 160,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFCE7F3), // Pink 100
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(16),
+            topRight: Radius.circular(40),
+            bottomLeft: Radius.circular(40),
+            bottomRight: Radius.circular(16),
+          ),
+          boxShadow: [
+            BoxShadow(color: const Color(0xFFEC4899).withOpacity(0.15), blurRadius: 20, offset: const Offset(0, 8))
+          ]
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(color: Colors.white.withOpacity(0.6), shape: BoxShape.circle),
+              child: const Icon(LucideIcons.heartPulse, color: Color(0xFFDB2777)),
+            ),
+            const Spacer(),
+            Text(vitals.bmi.toStringAsFixed(1), style: GoogleFonts.outfit(color: const Color(0xFF9D174D), fontSize: 32, fontWeight: FontWeight.w900, height: 1.0)),
+            const SizedBox(height: 4),
+            Text("BMI: ${vitals.bmiStatus}", style: GoogleFonts.outfit(color: const Color(0xFFBE185D), fontSize: 13, fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1),
+    );
+  }
+
+  Widget _buildMedicationCircle(BuildContext context, int taken, int total) {
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const MedicationTrackerScreen())),
+      child: Container(
+        height: 140, // Perfect circle logic with crossAxisAlignment.stretch needs constrained height or will follow width
+        decoration: BoxDecoration(
+          color: const Color(0xFFD1FAE5), // Mint 100
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(color: const Color(0xFF10B981).withOpacity(0.15), blurRadius: 20, offset: const Offset(0, 8))
+          ]
+        ),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(LucideIcons.pill, color: Color(0xFF059669)),
+              const SizedBox(height: 8),
+              Text(total == 0 ? "0" : "$taken/$total", style: GoogleFonts.outfit(color: const Color(0xFF065F46), fontSize: 24, fontWeight: FontWeight.w900, height: 1.0)),
+              Text("meds", style: GoogleFonts.outfit(color: const Color(0xFF047857), fontSize: 12, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
+      ).animate().fadeIn(delay: 400.ms).scale(begin: const Offset(0.8, 0.8)),
+    );
+  }
+
+  Widget _buildDailyInsightCard(String bmiStatus, bool overCalories) {
+    String message = "Your trackers look excellent! Keep maintaining this amazing healthy routine.";
     IconData icon = LucideIcons.thumbsUp;
-    Color color = Colors.blueAccent;
+    Color color = AppTheme.primaryBlue;
 
     if (bmiStatus != 'Normal') {
-      message = "Your BMI indicates you are $bmiStatus. Check the Vitals section for tips.";
+      message = "Your BMI sits outside the normal range. Adjust your routines and watch the dial turn!";
       icon = LucideIcons.alertCircle;
-      color = Colors.orangeAccent;
+      color = const Color(0xFFF59E0B);
     } else if (overCalories) {
-      message = "You've exceeded your calorie limit today. Try a light dinner.";
+      message = "You've exceeded your calorie limit today. Try a short walk to balance it out!";
       icon = LucideIcons.utensils;
-      color = Colors.redAccent;
+      color = AppTheme.error;
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
+        color: AppTheme.surfaceWhite,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(30),
+          topRight: Radius.circular(10),
+          bottomLeft: Radius.circular(10),
+          bottomRight: Radius.circular(30),
+        ),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 24, offset: const Offset(0, 8))
+        ],
+        border: Border.all(color: color.withOpacity(0.1)),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color),
-          const SizedBox(width: 15),
-          Expanded(child: Text(message, style: const TextStyle(color: Colors.white, height: 1.4))),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+            child: Icon(icon, color: color, size: 24)
+          ),
+          const SizedBox(width: 20),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Smart Insight", style: GoogleFonts.outfit(color: color, fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 0.5)),
+                const SizedBox(height: 6),
+                Text(message, style: const TextStyle(color: AppTheme.textDark, height: 1.5, fontSize: 15, fontWeight: FontWeight.w500)),
+              ],
+            )
+          ),
         ],
       ),
-    );
+    ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1);
   }
 }

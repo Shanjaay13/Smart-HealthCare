@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:my_sejahtera_ng/features/auth/screens/login_screen.dart';
 import 'package:my_sejahtera_ng/features/dashboard/screens/dashboard_screen.dart';
+import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -39,16 +40,16 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Cinematic Dark
+      backgroundColor: AppTheme.bgLight, 
       body: Stack(
         children: [
           // 1. Dynamic Background Gradient (Subtle pulse)
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
+                colors: [AppTheme.bgLight, const Color(0xFFF0FDF4), const Color(0xFFEFF6FF)],
               ),
             ),
           ).animate(onPlay: (c) => c.repeat(reverse: true))
@@ -61,73 +62,66 @@ class _SplashScreenState extends State<SplashScreen> {
               children: [
                 // Icon Animation
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(28),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.05),
+                    color: AppTheme.surfaceWhite,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withOpacity(0.1)),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.blueAccent.withOpacity(0.2),
-                        blurRadius: 30,
+                        color: AppTheme.primaryBlue.withOpacity(0.15),
+                        blurRadius: 40,
                         spreadRadius: 10,
+                        offset: const Offset(0, 15)
+                      ),
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.02),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                        offset: const Offset(0, 5)
                       )
                     ]
                   ),
-                  child: const Icon(LucideIcons.shieldCheck, color: Colors.blueAccent, size: 64),
+                  child: const Icon(LucideIcons.heartPulse, color: AppTheme.primaryBlue, size: 70),
                 ).animate()
                  .scale(duration: 1200.ms, curve: Curves.easeOutBack, begin: const Offset(0,0), end: const Offset(1,1))
-                 .shimmer(delay: 1200.ms, duration: 1500.ms, color: Colors.white)
-                 .then() // After 1200ms
-                 .boxShadow(begin: BoxShadow(color: Colors.blueAccent.withOpacity(0)), end: BoxShadow(color: Colors.blueAccent.withOpacity(0.5), blurRadius: 50, spreadRadius: 20), duration: 1000.ms),
+                 .shimmer(delay: 1200.ms, duration: 1500.ms, color: AppTheme.primaryBlue.withOpacity(0.2))
+                 .then() 
+                 .boxShadow(begin: BoxShadow(color: AppTheme.primaryBlue.withOpacity(0)), end: BoxShadow(color: AppTheme.primaryBlue.withOpacity(0.2), blurRadius: 40, spreadRadius: 15, offset: const Offset(0, 15)), duration: 1000.ms),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 35),
 
-                // Text Animation "MySejahtera"
-                Text(
-                  "MySejahtera",
-                  style: GoogleFonts.outfit(
-                    color: Colors.white,
-                    fontSize: 42,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.5,
-                  ),
+                // Text Animation "Smart HealthCare"
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Smart",
+                      style: GoogleFonts.outfit(
+                        color: AppTheme.primaryBlue,
+                        fontSize: 38,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "HealthCare",
+                      style: GoogleFonts.outfit(
+                        color: AppTheme.textDark,
+                        fontSize: 38,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -1,
+                      ),
+                    ),
+                  ],
                 ).animate()
-                 .fadeIn(duration: 800.ms, delay: 500.ms)
-                 .blur(begin: const Offset(10,10), end: const Offset(0,0), duration: 800.ms) // Cool cinematic blur-in
-                 .scale(begin: const Offset(0.8, 0.8), end: const Offset(1,1), duration: 800.ms),
-                 
-                 // Text Animation "NextGen"
-                 Row(
-                   mainAxisAlignment: MainAxisAlignment.center,
-                   children: [
-                     Text(
-                       "Next",
-                       style: GoogleFonts.outfit(
-                         color: Colors.white70,
-                         fontSize: 20,
-                         fontWeight: FontWeight.w300,
-                         letterSpacing: 4,
-                       ),
-                     ),
-                     Text(
-                       "Gen",
-                       style: GoogleFonts.outfit(
-                         color: Colors.blueAccent,
-                         fontSize: 20,
-                         fontWeight: FontWeight.bold,
-                         letterSpacing: 4,
-                       ),
-                     ),
-                   ],
-                 ).animate()
-                  .fadeIn(delay: 1000.ms, duration: 800.ms)
-                  .slideY(begin: 0.5, end: 0, duration: 800.ms, curve: Curves.easeOutCubic)
+                 .fadeIn(delay: 600.ms, duration: 800.ms)
+                 .slideY(begin: 0.3, end: 0, duration: 800.ms, curve: Curves.easeOutCubic)
               ],
             ),
           ),
           
-          // 3. Bottom Loading Indicator (Futuristic)
+          // 3. Bottom Loading Indicator
           Positioned(
             bottom: 60,
             left: 0, right: 0,
@@ -135,8 +129,8 @@ class _SplashScreenState extends State<SplashScreen> {
               child: SizedBox(
                 width: 40, height: 40,
                 child: const CircularProgressIndicator(
-                  color: Colors.blueAccent,
-                  strokeWidth: 2,
+                  color: AppTheme.primaryBlue,
+                  strokeWidth: 3,
                 ),
               ),
             ),

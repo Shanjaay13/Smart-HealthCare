@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:my_sejahtera_ng/core/widgets/glass_container.dart';
+import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
 import 'package:my_sejahtera_ng/core/widgets/bouncing_button.dart';
 import 'package:my_sejahtera_ng/features/food_tracker/providers/food_tracker_provider.dart';
 import 'package:my_sejahtera_ng/features/food_tracker/food_tracker_screen.dart';
@@ -16,6 +16,8 @@ class CalorieInsightCard extends ConsumerWidget {
     final progress = (state.totalCalories / state.calorieTarget).clamp(0.0, 1.0);
     final remaining = state.calorieTarget - state.totalCalories;
     final isOver = remaining < 0;
+    
+    final accentColor = isOver ? AppTheme.error : AppTheme.primaryBlue;
 
     return BouncingButton(
       onTap: () {
@@ -24,9 +26,24 @@ class CalorieInsightCard extends ConsumerWidget {
           MaterialPageRoute(builder: (context) => FoodTrackerScreen()),
         );
       },
-      child: GlassContainer(
-        borderRadius: BorderRadius.circular(25),
-        padding: const EdgeInsets.all(20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFFFEF3C7),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(50),
+            topRight: Radius.circular(20),
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(50),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFFF59E0B).withOpacity(0.15),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
+            )
+          ]
+        ),
+        padding: const EdgeInsets.all(24),
         child: Row(
           children: [
             // Circular Progress
@@ -41,35 +58,35 @@ class CalorieInsightCard extends ConsumerWidget {
                       width: 70,
                       child: CircularProgressIndicator(
                         value: progress,
-                        backgroundColor: Colors.white10,
-                        color: isOver ? Colors.redAccent : const Color(0xFF00C9E8),
-                        strokeWidth: 6,
+                        backgroundColor: AppTheme.bgLight,
+                        color: accentColor,
+                        strokeWidth: 8,
                         strokeCap: StrokeCap.round,
                       ),
                     ),
                   ),
                   Center(
                     child: Icon(
-                      LucideIcons.apple,
-                      color: isOver ? Colors.redAccent : const Color(0xFF00C9E8),
-                      size: 24,
+                      LucideIcons.flame,
+                      color: accentColor,
+                      size: 28,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 20),
+            const SizedBox(width: 24),
             
             // Text Content
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     "Calorie Intake",
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.6),
-                      fontSize: 12,
+                      color: AppTheme.textMuted,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.5,
                     ),
@@ -82,17 +99,17 @@ class CalorieInsightCard extends ConsumerWidget {
                       Text(
                         "${state.totalCalories}",
                         style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
+                          color: AppTheme.textDark,
+                          fontSize: 24,
                           fontWeight: FontWeight.w900,
                         ),
                       ),
                       Text(
                         " / ${state.calorieTarget} kcal",
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.5),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
+                        style: const TextStyle(
+                          color: AppTheme.textMuted,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -101,22 +118,18 @@ class CalorieInsightCard extends ConsumerWidget {
                   
                   // AI Insight Pill
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: (isOver ? Colors.redAccent : const Color(0xFF00C9E8)).withValues(alpha: 0.1),
+                      color: accentColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: (isOver ? Colors.redAccent : const Color(0xFF00C9E8)).withValues(alpha: 0.3),
-                        width: 1,
-                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           LucideIcons.sparkles,
-                          size: 10,
-                          color: isOver ? Colors.redAccent : const Color(0xFF00C9E8),
+                          size: 12,
+                          color: accentColor,
                         ),
                         const SizedBox(width: 6),
                         Flexible(
@@ -125,8 +138,8 @@ class CalorieInsightCard extends ConsumerWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: isOver ? Colors.redAccent : const Color(0xFF00C9E8),
-                              fontSize: 11,
+                              color: accentColor,
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -139,14 +152,14 @@ class CalorieInsightCard extends ConsumerWidget {
             ),
             
             // Chevron
-            Icon(
+            const Icon(
               LucideIcons.chevronRight,
-              color: Colors.white.withValues(alpha: 0.3),
-              size: 20,
+              color: AppTheme.textMuted,
+              size: 24,
             ),
           ],
         ),
       ),
-    ).animate().fadeIn(duration: 600.ms).slideY(begin: 0.2, end: 0);
+    );
   }
 }

@@ -114,7 +114,7 @@ class _VaccineSetupScreenState extends ConsumerState<VaccineSetupScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [AppTheme.primaryDark, AppTheme.primaryBlue],
+            colors: [const Color(0xFF0284C7), AppTheme.primaryBlue],
           ),
         ),
         child: SafeArea(
@@ -194,10 +194,10 @@ class _VaccineSetupScreenState extends ConsumerState<VaccineSetupScreen> {
                             onPressed: _isLoading ? null : _saveRecord,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppTheme.accentTeal,
-                              foregroundColor: AppTheme.primaryDark,
+                              foregroundColor: AppTheme.primaryBlue,
                             ),
                             child: _isLoading
-                                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryDark))
+                                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryBlue))
                                 : const Text("Save & Continue", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           ),
                         ),

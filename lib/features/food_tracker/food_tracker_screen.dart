@@ -5,19 +5,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:my_sejahtera_ng/core/widgets/glass_container.dart';
 import 'package:intl/intl.dart';
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:my_sejahtera_ng/features/food_tracker/providers/food_tracker_provider.dart';
 import 'package:my_sejahtera_ng/core/utils/ui_utils.dart';
+import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
 
-
-
-// --- MAIN UI ---
 // --- MAIN UI ---
 class FoodTrackerScreen extends ConsumerStatefulWidget {
   final bool autoShowHydration;
@@ -68,55 +64,70 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
     final randomSuggestion = suggestions[Random().nextInt(suggestions.length)];
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      backgroundColor: AppTheme.bgLight,
       appBar: AppBar(
-        title: const Text("FOOD INTAKE MONITOR", style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Colors.amberAccent)),
-        backgroundColor: Colors.transparent,
+        title: const Text("Food Intake Monitor", style: TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold)),
+        backgroundColor: AppTheme.bgLight,
+        iconTheme: const IconThemeData(color: AppTheme.textDark),
         elevation: 0,
         actions: [_buildConfigMenu(context, ref, state)],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0F2027), Color(0xFF2C5364)],
-          ),
-        ),
+      body: SafeArea(
         child: Stack(
           children: [
             SingleChildScrollView(
               controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(20, 120, 20, 40),
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildProgressCard(state),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
                   _buildCalorieChart(state),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 32),
                   
                   // Hydration Panel
                   Container(key: _hydrationKey, child: _buildHydrationPanel(state)),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 32),
 
                   _sectionHeader("TODAY'S LOGS"),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 16),
                   _buildFoodLogList(context, ref, state),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 32),
 
                   _sectionHeader("AI HEALTH INSIGHTS"),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 16),
                   _buildDynamicInsights(state),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 32),
                   _sectionHeader("HEALTHY SUGGESTIONS"),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 16),
                   _buildSuggestionCard(randomSuggestion),
                   const SizedBox(height: 40),
-                  _buildActionRow(context, ref),
                 ],
               ),
             ),
+            
+            // Bottom Action Bar Fixed
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceWhite,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, -5),
+                    )
+                  ]
+                ),
+                child: _buildActionRow(context, ref),
+              ),
+            ),
+
             if (state.isScanning) _buildScanningOverlay(),
           ],
         ),
@@ -125,49 +136,65 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
   }
 
   Widget _buildHydrationPanel(FoodTrackerState state) {
-    return GlassContainer(
-      borderRadius: BorderRadius.circular(25),
-      padding: const EdgeInsets.all(20),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+           BoxShadow(
+             color: Colors.black.withOpacity(0.03),
+             blurRadius: 16,
+             offset: const Offset(0, 4),
+           )
+        ]
+      ),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               const Text("Hydration", style: TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, fontSize: 16)),
-               Icon(LucideIcons.droplets, color: Colors.cyanAccent.withOpacity(0.5), size: 20),
+               const Text("Hydration", style: TextStyle(color: AppTheme.textMuted, fontWeight: FontWeight.bold, fontSize: 16)),
+               Container(
+                 padding: const EdgeInsets.all(8),
+                 decoration: BoxDecoration(color: const Color(0xFF0EA5E9).withOpacity(0.1), shape: BoxShape.circle),
+                 child: const Icon(LucideIcons.droplets, color: Color(0xFF0EA5E9), size: 18)
+               ),
             ],
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
                Column(
                  crossAxisAlignment: CrossAxisAlignment.start,
                  children: [
-                    Text("${state.waterCount} / 8", style: GoogleFonts.outfit(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
-                    const Text("Glasses Today", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                    Text("${state.waterCount} / 8", style: GoogleFonts.outfit(color: AppTheme.textDark, fontSize: 36, fontWeight: FontWeight.w900)),
+                    const Text("Glasses Today", style: TextStyle(color: AppTheme.textMuted, fontSize: 13, fontWeight: FontWeight.w600)),
                  ],
                ),
                ElevatedButton(
                  onPressed: () => _logEntry(context, ref, true),
                  style: ElevatedButton.styleFrom(
-                   backgroundColor: Colors.cyanAccent.withOpacity(0.2),
-                   foregroundColor: Colors.cyanAccent,
+                   backgroundColor: const Color(0xFF0EA5E9),
+                   foregroundColor: Colors.white,
                    shape: const CircleBorder(),
-                   padding: const EdgeInsets.all(12),
+                   padding: const EdgeInsets.all(16),
+                   elevation: 4,
+                   shadowColor: const Color(0xFF0EA5E9).withOpacity(0.4),
                  ),
-                 child: const Icon(LucideIcons.plus, size: 24),
+                 child: const Icon(LucideIcons.plus, size: 28),
                )
             ],
           ),
-          const SizedBox(height: 15),
+          const SizedBox(height: 24),
           LinearProgressIndicator(
             value: (state.waterCount / 8).clamp(0.0, 1.0),
-            backgroundColor: Colors.white10,
-            color: Colors.cyanAccent,
-            minHeight: 6,
-            borderRadius: BorderRadius.circular(3),
+            backgroundColor: AppTheme.bgLight,
+            color: const Color(0xFF0EA5E9),
+            minHeight: 8,
+            borderRadius: BorderRadius.circular(4),
           ),
         ],
       ),
@@ -177,9 +204,9 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
   Widget _buildFoodLogList(BuildContext context, WidgetRef ref, FoodTrackerState state) {
     if (state.foods.isEmpty) {
       return Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(15)),
-        child: const Center(child: Text("No food logged today.", style: TextStyle(color: Colors.white54))),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(color: AppTheme.surfaceWhite, borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.black12)),
+        child: const Center(child: Text("No food logged today.", style: TextStyle(color: AppTheme.textMuted))),
       );
     }
 
@@ -190,8 +217,8 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
           direction: DismissDirection.endToStart,
           background: Container(
             alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: 20),
-            decoration: BoxDecoration(color: Colors.redAccent, borderRadius: BorderRadius.circular(15)),
+            padding: const EdgeInsets.only(right: 24),
+            decoration: BoxDecoration(color: AppTheme.error, borderRadius: BorderRadius.circular(20)),
             child: const Icon(LucideIcons.trash2, color: Colors.white),
           ),
           onDismissed: (_) {
@@ -202,15 +229,25 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
           child: GestureDetector(
             onTap: () => _showEditFoodDialog(context, ref, food),
             child: Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(15)),
+              margin: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceWhite, 
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))
+                ]
+              ),
               child: Row(
                 children: [
-                  const Icon(LucideIcons.utensils, color: Colors.orangeAccent, size: 20),
-                  const SizedBox(width: 15),
-                  Expanded(child: Text(food.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
-                  Text("${food.calories} kcal", style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.w600)),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: const Color(0xFFF59E0B).withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                    child: const Icon(LucideIcons.utensils, color: Color(0xFFF59E0B), size: 20)
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(child: Text(food.name, style: const TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 16))),
+                  Text("${food.calories} kcal", style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -228,20 +265,42 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF161B1E),
-        title: const Text("Edit Food", style: TextStyle(color: Colors.white)),
+        backgroundColor: AppTheme.surfaceWhite,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text("Edit Food", style: TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: nameCtrl, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Name", labelStyle: TextStyle(color: Colors.white54))),
-            const SizedBox(height: 15),
-            TextField(controller: calCtrl, keyboardType: TextInputType.number, style: const TextStyle(color: Colors.white), decoration: const InputDecoration(labelText: "Calories", labelStyle: TextStyle(color: Colors.white54))),
+            TextField(
+              controller: nameCtrl, 
+              style: const TextStyle(color: AppTheme.textDark), 
+              decoration: InputDecoration(
+                labelText: "Name", 
+                labelStyle: const TextStyle(color: AppTheme.textMuted),
+                filled: true,
+                fillColor: AppTheme.bgLight,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)
+              )
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: calCtrl, 
+              keyboardType: TextInputType.number, 
+              style: const TextStyle(color: AppTheme.textDark), 
+              decoration: InputDecoration(
+                labelText: "Calories", 
+                labelStyle: const TextStyle(color: AppTheme.textMuted),
+                filled: true,
+                fillColor: AppTheme.bgLight,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)
+              )
+            ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel")),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel", style: TextStyle(color: AppTheme.textMuted))),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.cyanAccent, foregroundColor: Colors.black),
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             onPressed: () {
               final newName = nameCtrl.text.trim();
               final newCal = int.tryParse(calCtrl.text) ?? food.calories;
@@ -261,17 +320,18 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
 
   Widget _buildConfigMenu(BuildContext context, WidgetRef ref, FoodTrackerState state) {
     return PopupMenuButton<String>(
-      icon: const Icon(LucideIcons.settings, color: Colors.white70),
-      color: const Color(0xFF161B1E),
+      icon: const Icon(LucideIcons.settings, color: AppTheme.textDark),
+      color: AppTheme.surfaceWhite,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       onSelected: (value) {
         if (value == 'target') _openTargetSheet(context, ref, state);
         if (value == 'allergy') _openAllergySheet(context, ref, state);
         if (value == 'reset') _showResetDialog(context, ref);
       },
       itemBuilder: (ctx) => [
-        const PopupMenuItem(value: 'target', child: ListTile(leading: Icon(LucideIcons.target, color: Colors.cyanAccent), title: Text("Daily Goal", style: TextStyle(color: Colors.white)))),
-        const PopupMenuItem(value: 'allergy', child: ListTile(leading: Icon(LucideIcons.shieldAlert, color: Colors.redAccent), title: Text("Allergies", style: TextStyle(color: Colors.white)))),
-        const PopupMenuItem(value: 'reset', child: ListTile(leading: Icon(LucideIcons.refreshCcw, color: Colors.orangeAccent), title: Text("Reset Data", style: TextStyle(color: Colors.white)))),
+        const PopupMenuItem(value: 'target', child: ListTile(leading: Icon(LucideIcons.target, color: AppTheme.primaryBlue), title: Text("Daily Goal", style: TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold)))),
+        const PopupMenuItem(value: 'allergy', child: ListTile(leading: Icon(LucideIcons.shieldAlert, color: AppTheme.error), title: Text("Allergies", style: TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold)))),
+        const PopupMenuItem(value: 'reset', child: ListTile(leading: Icon(LucideIcons.refreshCcw, color: Color(0xFFF59E0B)), title: Text("Reset Data", style: TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold)))),
       ],
     );
   }
@@ -282,22 +342,30 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF161B1E),
+      backgroundColor: AppTheme.surfaceWhite,
       isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
       builder: (_) => Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 24, right: 24, top: 24),
         child: Form(
           key: formKey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("SET DAILY TARGET", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
+              const Text("Set Daily Goal", style: TextStyle(color: AppTheme.textDark, fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 24),
               TextFormField(
                 controller: c,
                 keyboardType: TextInputType.number,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(labelText: "Calories (kcal)", labelStyle: TextStyle(color: Colors.white54)),
+                style: const TextStyle(color: AppTheme.textDark),
+                decoration: InputDecoration(
+                  labelText: "Calories (kcal)", 
+                  labelStyle: const TextStyle(color: AppTheme.textMuted),
+                  filled: true,
+                  fillColor: AppTheme.bgLight,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) return "Please set your daily calorie goal";
                   final n = int.tryParse(value);
@@ -307,15 +375,19 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  if (formKey.currentState!.validate()) {
-                    ref.read(foodTrackerProvider.notifier).setTarget(int.parse(c.text));
-                    Navigator.pop(context);
-                  }
-                },
-                child: const Text("SAVE TARGET"),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 16), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+                  onPressed: () {
+                    if (formKey.currentState!.validate()) {
+                      ref.read(foodTrackerProvider.notifier).setTarget(int.parse(c.text));
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text("SAVE TARGET", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
+                ),
               ),
               const SizedBox(height: 30),
             ],
@@ -334,32 +406,48 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF161B1E),
+      backgroundColor: AppTheme.surfaceWhite,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
       builder: (ctx) => StatefulBuilder(
         builder: (c, setST) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 24, right: 24, top: 24),
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 24, right: 24, top: 30),
           child: Form(
             key: formKey,
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(isDrink ? "LOG DRINK" : "LOG FOOD", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 15),
+                Text(isDrink ? "Log Drink" : "Log Food", style: const TextStyle(color: AppTheme.textDark, fontSize: 22, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 24),
                 if (isDrink) ...[
-                  DropdownButton<DrinkType>(
-                    dropdownColor: const Color(0xFF161B1E),
-                    value: drinkType,
-                    items: DrinkType.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: const TextStyle(color: Colors.white)))).toList(),
-                    onChanged: (v) => setST(() {
-                      drinkType = v!;
-                      if (drinkType == DrinkType.water) calCtrl.text = "0";
-                    }),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(color: AppTheme.bgLight, borderRadius: BorderRadius.circular(16)),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<DrinkType>(
+                        dropdownColor: AppTheme.surfaceWhite,
+                        value: drinkType,
+                        items: DrinkType.values.map((e) => DropdownMenuItem(value: e, child: Text(e.name, style: const TextStyle(color: AppTheme.textDark)))).toList(),
+                        onChanged: (v) => setST(() {
+                          drinkType = v!;
+                          if (drinkType == DrinkType.water) calCtrl.text = "0";
+                        }),
+                      ),
+                    ),
                   ),
+                  const SizedBox(height: 16),
                 ],
                 TextFormField(
                   controller: nameCtrl,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(hintText: isDrink ? "Drink Name" : "Food Name", hintStyle: const TextStyle(color: Colors.white24)),
+                  style: const TextStyle(color: AppTheme.textDark),
+                  decoration: InputDecoration(
+                    hintText: isDrink ? "Drink Name (e.g. Mocha)" : "Food Name (e.g. Salad)", 
+                    hintStyle: const TextStyle(color: AppTheme.textMuted),
+                    filled: true,
+                    fillColor: AppTheme.bgLight,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none)
+                  ),
                   validator: (value) {
                     final trimmed = value?.trim() ?? "";
                     if (trimmed.isEmpty) return "Please enter a valid name";
@@ -368,12 +456,19 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 16),
                 if (drinkType != DrinkType.water)
                   TextFormField(
                     controller: calCtrl,
                     keyboardType: TextInputType.number,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(hintText: "Calories", hintStyle: TextStyle(color: Colors.white24)),
+                    style: const TextStyle(color: AppTheme.textDark),
+                    decoration: InputDecoration(
+                      hintText: "Calories (kcal)", 
+                      hintStyle: const TextStyle(color: AppTheme.textMuted),
+                      filled: true,
+                      fillColor: AppTheme.bgLight,
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none)
+                    ),
                     validator: (value) {
                       if (value == null || value.isEmpty) return "Enter calorie amount";
                       final n = int.tryParse(value);
@@ -383,25 +478,29 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                       return null;
                     },
                   ),
-                const SizedBox(height: 25),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (formKey.currentState!.validate()) {
-                      final name = nameCtrl.text.trim();
-                      final cal = int.tryParse(calCtrl.text) ?? 0;
-                      Navigator.pop(ctx);
-
-                      final riskMessage = await ref.read(foodTrackerProvider.notifier).checkAllergyRisk(name);
-                      if (riskMessage != null) {
-                        _showAllergenWarning(context, riskMessage, () {
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 20), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+                    onPressed: () async {
+                      if (formKey.currentState!.validate()) {
+                        final name = nameCtrl.text.trim();
+                        final cal = int.tryParse(calCtrl.text) ?? 0;
+                        Navigator.pop(ctx);
+  
+                        final riskMessage = await ref.read(foodTrackerProvider.notifier).checkAllergyRisk(name);
+                        if (riskMessage != null) {
+                          _showAllergenWarning(context, riskMessage, () {
+                            isDrink ? ref.read(foodTrackerProvider.notifier).addDrink(name, cal, drinkType) : ref.read(foodTrackerProvider.notifier).addFood(name, cal);
+                          });
+                        } else {
                           isDrink ? ref.read(foodTrackerProvider.notifier).addDrink(name, cal, drinkType) : ref.read(foodTrackerProvider.notifier).addFood(name, cal);
-                        });
-                      } else {
-                        isDrink ? ref.read(foodTrackerProvider.notifier).addDrink(name, cal, drinkType) : ref.read(foodTrackerProvider.notifier).addFood(name, cal);
+                        }
                       }
-                    }
-                  },
-                  child: const Text("ANALYZE & ADD"),
+                    },
+                    child: const Text("SAVE ENTRY", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
+                  ),
                 ),
                 const SizedBox(height: 30),
               ],
@@ -419,54 +518,78 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
     final calPercent = state.totalCalories / state.calorieTarget;
 
     if (calPercent > 1.0) {
-      messages.add(_insightItem("Warning: Calorie target exceeded by ${(state.totalCalories - state.calorieTarget)} kcal.", Colors.redAccent, LucideIcons.frown));
+      messages.add(_insightItem("Warning: Calorie target exceeded by ${(state.totalCalories - state.calorieTarget)} kcal.", AppTheme.error, LucideIcons.frown));
     } else if (calPercent > 0.8) {
-      messages.add(_insightItem("Approaching limit. Consider lighter snacks for later.", Colors.orangeAccent, LucideIcons.gauge));
+      messages.add(_insightItem("Approaching limit. Consider lighter snacks for later.", const Color(0xFFF59E0B), LucideIcons.gauge));
     }
 
     if (state.waterCount < 3) {
-      messages.add(_insightItem("Hydration Low: You've logged less than 3 glasses of water.", Colors.blueAccent, LucideIcons.droplets));
+      messages.add(_insightItem("Hydration Low: You've logged less than 3 glasses of water.", AppTheme.primaryBlue, LucideIcons.droplets));
     } else {
-      messages.add(_insightItem("Hydration Good: Keep maintaining this water intake!", Colors.greenAccent, LucideIcons.smile));
+      messages.add(_insightItem("Hydration Good: Keep maintaining this water intake!", AppTheme.success, LucideIcons.smile));
     }
     return Column(children: messages);
   }
 
   Widget _insightItem(String text, Color color, IconData icon) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: color.withOpacity(0.05), borderRadius: BorderRadius.circular(15), border: Border.all(color: color.withOpacity(0.2))),
-      child: Row(children: [Icon(icon, color: color, size: 18), const SizedBox(width: 12), Expanded(child: Text(text, style: const TextStyle(color: Colors.white70, fontSize: 13)))]),
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(color: color.withOpacity(0.05), borderRadius: BorderRadius.circular(16), border: Border.all(color: color.withOpacity(0.1))),
+      child: Row(children: [
+        Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle), child: Icon(icon, color: color, size: 18)), 
+        const SizedBox(width: 16), 
+        Expanded(child: Text(text, style: const TextStyle(color: AppTheme.textDark, fontSize: 13, height: 1.4, fontWeight: FontWeight.w600)))
+      ]),
     ).animate().fadeIn().slideX();
   }
 
   Widget _buildSuggestionCard(String text) {
-    return GlassContainer(
-      borderRadius: BorderRadius.circular(20),
-      padding: const EdgeInsets.all(16),
-      child: Row(children: [const Icon(LucideIcons.lightbulb, color: Colors.amberAccent, size: 24), const SizedBox(width: 15), Expanded(child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.4)))]),
-    ).animate().shimmer(duration: 2.seconds);
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))]
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Row(children: [
+        Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFFF59E0B).withOpacity(0.1), shape: BoxShape.circle), child: const Icon(LucideIcons.lightbulb, color: Color(0xFFF59E0B), size: 24)), 
+        const SizedBox(width: 16), 
+        Expanded(child: Text(text, style: const TextStyle(color: AppTheme.textDark, fontSize: 13, height: 1.5)))
+      ]),
+    ).animate().fadeIn(duration: 800.ms);
   }
 
   Widget _buildProgressCard(FoodTrackerState state) {
     double progress = (state.totalCalories / state.calorieTarget).clamp(0.0, 1.0);
-    return GlassContainer(
-      borderRadius: BorderRadius.circular(30),
-      padding: const EdgeInsets.all(24),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 8))]
+      ),
+      padding: const EdgeInsets.all(32),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Today's Progress", style: TextStyle(color: Colors.white38, fontSize: 14)),
-              Text("${(progress * 100).toInt()}%", style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold)),
+              const Text("Daily Intake", style: TextStyle(color: AppTheme.textMuted, fontSize: 16, fontWeight: FontWeight.bold)),
+              Container(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), decoration: BoxDecoration(color: AppTheme.primaryBlue.withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: Text("${(progress * 100).toInt()}%", style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold))),
             ],
           ),
-          const SizedBox(height: 15),
-          LinearProgressIndicator(value: progress, backgroundColor: Colors.white10, color: progress >= 1.0 ? Colors.redAccent : Colors.cyanAccent, minHeight: 8),
-          const SizedBox(height: 15),
-          Text("${state.totalCalories} / ${state.calorieTarget} kcal", style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 24),
+          LinearProgressIndicator(value: progress, backgroundColor: AppTheme.bgLight, color: progress >= 1.0 ? AppTheme.error : AppTheme.primaryBlue, minHeight: 10, borderRadius: BorderRadius.circular(5)),
+          const SizedBox(height: 24),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("${state.totalCalories}", style: const TextStyle(color: AppTheme.textDark, fontSize: 48, fontWeight: FontWeight.w900)),
+              Text(" / ${state.calorieTarget} kcal", style: const TextStyle(color: AppTheme.textMuted, fontSize: 16, fontWeight: FontWeight.bold)),
+            ]
+          )
         ],
       ),
     );
@@ -481,37 +604,41 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
     for (var cal in state.dailyHistory.values) {
       if (cal > maxCalories) maxCalories = cal.toDouble();
     }
-    final maxY = maxCalories * 1.2; // Add 20% buffer
+    final maxY = maxCalories * 1.2; 
 
     final isOverLimit = state.totalCalories > state.calorieTarget;
 
-    return GlassContainer(
-      borderRadius: BorderRadius.circular(25),
-      padding: const EdgeInsets.all(20),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 16, offset: const Offset(0, 4))]
+      ),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("7-Day Trend", style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold)),
+              const Text("7-Day Trend", style: TextStyle(color: AppTheme.textMuted, fontSize: 16, fontWeight: FontWeight.bold)),
               if (isOverLimit)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(color: Colors.red.withOpacity(0.2), borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.redAccent)),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(color: AppTheme.error.withOpacity(0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: AppTheme.error.withOpacity(0.3))),
                   child: Row(
                     children: [
-                      const Icon(LucideIcons.alertTriangle, color: Colors.redAccent, size: 12),
-                      const SizedBox(width: 4),
-                      Text("High Intake", style: TextStyle(color: Colors.redAccent, fontSize: 10, fontWeight: FontWeight.bold)),
+                      const Icon(LucideIcons.alertTriangle, color: AppTheme.error, size: 12),
+                      const SizedBox(width: 6),
+                      const Text("High Intake", style: TextStyle(color: AppTheme.error, fontSize: 10, fontWeight: FontWeight.bold)),
                     ],
                   ),
-                ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(duration: 1.seconds, begin: const Offset(1, 1), end: const Offset(1.1, 1.1)),
+                ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(duration: 1.seconds, begin: const Offset(1, 1), end: const Offset(1.05, 1.05)),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 32),
           SizedBox(
-            height: 150,
+            height: 180,
             child: BarChart(
               BarChartData(
                 gridData: const FlGridData(show: false),
@@ -525,7 +652,10 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                       showTitles: true,
                       getTitlesWidget: (val, meta) {
                         final date = today.subtract(Duration(days: 6 - val.toInt()));
-                        return Text(DateFormat('E').format(date).substring(0, 1), style: const TextStyle(color: Colors.white38, fontSize: 11));
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(DateFormat('E').format(date).substring(0, 1), style: const TextStyle(color: AppTheme.textMuted, fontSize: 12, fontWeight: FontWeight.bold)),
+                        );
                       },
                     ),
                   ),
@@ -539,10 +669,10 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                     barRods: [
                       BarChartRodData(
                         toY: calories,
-                        color: calories > state.calorieTarget ? Colors.redAccent : Colors.cyanAccent,
-                        width: 14,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
-                        backDrawRodData: BackgroundBarChartRodData(show: true, toY: maxY, color: Colors.white.withOpacity(0.0)), // Use transparent background relative to max
+                        color: calories > state.calorieTarget ? AppTheme.error : AppTheme.primaryBlue,
+                        width: 16,
+                        borderRadius: BorderRadius.circular(4),
+                        backDrawRodData: BackgroundBarChartRodData(show: true, toY: maxY, color: AppTheme.bgLight), 
                       )
                     ],
                   );
@@ -557,9 +687,9 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
 
   Widget _buildActionRow(BuildContext context, WidgetRef ref) {
     return Row(children: [
-      _mainBtn("AI SCAN", LucideIcons.scanLine, Colors.purpleAccent, () => _showScanOptions(context, ref)),
-      const SizedBox(width: 10),
-      _mainBtn("DESCRIBE", LucideIcons.textCursorInput, Colors.orangeAccent, () => _processText(context, ref)),
+      _mainBtn("AI SCAN", LucideIcons.scanLine, const Color(0xFF8B5CF6), () => _showScanOptions(context, ref)),
+      const SizedBox(width: 16),
+      _mainBtn("DESCRIBE", LucideIcons.textCursorInput, const Color(0xFFF59E0B), () => _processText(context, ref)),
     ]);
   }
 
@@ -567,33 +697,39 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
     return Expanded(
       child: ElevatedButton.icon(
         onPressed: onTap,
-        icon: Icon(i, size: 18),
-        label: Text(l, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11)), // Smaller font
+        icon: Icon(i, size: 20),
+        label: Text(l, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)), 
         style: ElevatedButton.styleFrom(
-            backgroundColor: c.withOpacity(0.1),
-            foregroundColor: c,
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: c.withOpacity(0.3)))),
+            backgroundColor: c,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            elevation: 4,
+            shadowColor: c.withOpacity(0.4)
+        ),
       ),
     );
   }
 
-  Widget _sectionHeader(String t) => Text(t, style: const TextStyle(color: Colors.white54, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.2));
+  Widget _sectionHeader(String t) => Text(t, style: const TextStyle(color: AppTheme.textMuted, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 1.2));
 
   void _showScanOptions(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF161B1E),
+      backgroundColor: AppTheme.surfaceWhite,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("AI CALORIE SCAN", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
-            const SizedBox(height: 20),
+            const Text("AI Calorie Scan", style: TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 22)),
+            const SizedBox(height: 24),
             _scanOptionTile(ctx, "Take Photo", LucideIcons.camera, () => _processImage(context, ref, ImageSource.camera)),
+            const SizedBox(height: 12),
             _scanOptionTile(ctx, "Choose from Gallery", LucideIcons.image, () => _processImage(context, ref, ImageSource.gallery)),
-
+            const SizedBox(height: 10),
           ],
         ),
       ),
@@ -602,8 +738,9 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
 
   Widget _scanOptionTile(BuildContext context, String title, IconData icon, VoidCallback onTap) {
     return ListTile(
-      leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: Colors.purpleAccent.withOpacity(0.2), shape: BoxShape.circle), child: Icon(icon, color: Colors.purpleAccent)),
-      title: Text(title, style: const TextStyle(color: Colors.white)),
+      contentPadding: EdgeInsets.zero,
+      leading: Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: const Color(0xFF8B5CF6).withOpacity(0.1), borderRadius: BorderRadius.circular(12)), child: const Icon(LucideIcons.camera, color: Color(0xFF8B5CF6))),
+      title: Text(title, style: const TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold)),
       onTap: () {
         Navigator.pop(context);
         onTap();
@@ -629,14 +766,14 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
       if (image != null) {
         try {
            final result = await ref.read(foodTrackerProvider.notifier).analyzeFoodImage(image);
-           if (result != null) _showAnalysisResult(context, ref, result);
+           if (result != null && context.mounted) _showAnalysisResult(context, ref, result);
         } catch (e) {
-           _showErrorDialog(context, getFriendlyErrorMessage(e));
+           if (context.mounted) _showErrorDialog(context, getFriendlyErrorMessage(e));
         }
       }
     } catch (e) {
       debugPrint("Picker Error: $e");
-      _showErrorDialog(context, getFriendlyErrorMessage(e));
+      if (context.mounted) _showErrorDialog(context, getFriendlyErrorMessage(e));
     }
   }
 
@@ -645,30 +782,37 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF161B1E),
-        title: const Text("Describe Meal", style: TextStyle(color: Colors.white)),
+        backgroundColor: AppTheme.surfaceWhite,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text("Describe Meal", style: TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold)),
         content: TextField(
           controller: controller,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(hintText: "e.g. A bowl of chicken curry with rice", hintStyle: TextStyle(color: Colors.white30)),
+          style: const TextStyle(color: AppTheme.textDark),
+          decoration: InputDecoration(
+            hintText: "e.g. A bowl of chicken curry with rice", 
+            hintStyle: const TextStyle(color: AppTheme.textMuted),
+            filled: true,
+            fillColor: AppTheme.bgLight,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)
+          ),
           autofocus: true,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("CANCEL")),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel", style: TextStyle(color: AppTheme.textMuted))),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.purpleAccent),
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFF59E0B), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             onPressed: () async {
               Navigator.pop(ctx);
               if (controller.text.isNotEmpty) {
                  try {
                     final result = await ref.read(foodTrackerProvider.notifier).analyzeFoodText(controller.text);
-                    if (result != null) _showAnalysisResult(context, ref, result);
+                    if (result != null && context.mounted) _showAnalysisResult(context, ref, result);
                  } catch (e) {
-                    _showErrorDialog(context, getFriendlyErrorMessage(e));
+                    if (context.mounted) _showErrorDialog(context, getFriendlyErrorMessage(e));
                  }
               }
             }, 
-            child: const Text("ANALYZE")
+            child: const Text("Analyze")
           ),
         ],
       ),
@@ -681,35 +825,52 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
     
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF161B1E),
+      backgroundColor: AppTheme.surfaceWhite,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
       isScrollControlled: true,
       builder: (ctx) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 24, right: 24, top: 24),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 32, right: 32, top: 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(children: [
-              const Icon(LucideIcons.sparkles, color: Colors.purpleAccent),
-              const SizedBox(width: 10),
-              const Text("AI ANALYSIS RESULT", style: TextStyle(color: Colors.purpleAccent, fontWeight: FontWeight.bold)),
+              Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFF8B5CF6).withOpacity(0.1), shape: BoxShape.circle), child: const Icon(LucideIcons.sparkles, color: Color(0xFF8B5CF6), size: 18)),
+              const SizedBox(width: 12),
+              const Text("AI Analysis Result", style: TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 20)),
             ]),
-            const SizedBox(height: 10),
-            Text(result['description'] ?? "Food identified.", style: const TextStyle(color: Colors.white70, fontStyle: FontStyle.italic, fontSize: 13)),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: AppTheme.bgLight, borderRadius: BorderRadius.circular(16)),
+              child: Text(result['description'] ?? "Food identified.", style: const TextStyle(color: AppTheme.textMuted, fontStyle: FontStyle.italic, fontSize: 14, height: 1.4)),
+            ),
+            const SizedBox(height: 24),
             TextField(
               controller: nameCtrl,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(labelText: "Food Name", labelStyle: TextStyle(color: Colors.white54)),
+              style: const TextStyle(color: AppTheme.textDark),
+              decoration: InputDecoration(
+                labelText: "Food Name", 
+                labelStyle: const TextStyle(color: AppTheme.textMuted),
+                filled: true,
+                fillColor: AppTheme.bgLight,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)
+              ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             TextField(
               controller: calCtrl,
               keyboardType: TextInputType.number,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(labelText: "Calories", labelStyle: TextStyle(color: Colors.white54)),
+              style: const TextStyle(color: AppTheme.textDark),
+               decoration: InputDecoration(
+                labelText: "Calories", 
+                labelStyle: const TextStyle(color: AppTheme.textMuted),
+                filled: true,
+                fillColor: AppTheme.bgLight,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)
+              ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -717,25 +878,21 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                    final name = nameCtrl.text;
                    final cal = int.tryParse(calCtrl.text) ?? 0;
                    if (name.isNotEmpty && cal > 0) {
-                     // 1. Check for Allergy Risk
                      final riskMessage = await ref.read(foodTrackerProvider.notifier).checkAllergyRisk(name);
                      
-                     if (riskMessage != null) {
-                        // 2. Show Warning if detected
-                        _showAllergenWarning(context, riskMessage, () {
-                           // 3. Add on confirmation
+                     if (riskMessage != null && ctx.mounted) {
+                        _showAllergenWarning(ctx, riskMessage, () {
                            ref.read(foodTrackerProvider.notifier).addFood(name, cal);
                            Navigator.pop(ctx); 
                         });
-                     } else {
-                        // 4. Add immediately if safe
+                     } else if (ctx.mounted) {
                         ref.read(foodTrackerProvider.notifier).addFood(name, cal);
                         Navigator.pop(ctx);
                      }
                    }
                 },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.purpleAccent, padding: const EdgeInsets.symmetric(vertical: 16)),
-                child: const Text("CONFIRM & ADD"),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF8B5CF6), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 20), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+                child: const Text("CONFIRM & ADD", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1)),
               ),
             ),
             const SizedBox(height: 30),
@@ -748,19 +905,22 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
   void _openAllergySheet(BuildContext context, WidgetRef ref, FoodTrackerState s) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF161B1E),
+      backgroundColor: AppTheme.surfaceWhite,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(30))),
       builder: (ctx) => StatefulBuilder(
         builder: (context, setST) => Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("SELECT ALLERGENS", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 20),
+              const Text("Select Allergens", style: TextStyle(color: AppTheme.textDark, fontSize: 22, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              const Text("We will warn you if AI detects these in scanned food.", style: TextStyle(color: AppTheme.textMuted)),
+              const SizedBox(height: 24),
               Wrap(
-                spacing: 10,
-                runSpacing: 10,
+                spacing: 12,
+                runSpacing: 12,
                 children: availableAllergens.map((allergy) {
                   final isSelected = ref.watch(foodTrackerProvider).allergies.contains(allergy);
                   return GestureDetector(
@@ -768,20 +928,29 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                       ref.read(foodTrackerProvider.notifier).toggleAllergy(allergy);
                       setST(() {});
                     },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                       decoration: BoxDecoration(
-                        color: isSelected ? Colors.red.withOpacity(0.2) : Colors.white.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: isSelected ? Colors.redAccent : Colors.transparent),
+                        color: isSelected ? AppTheme.error.withOpacity(0.1) : AppTheme.bgLight,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: isSelected ? AppTheme.error.withOpacity(0.5) : Colors.transparent),
                       ),
-                      child: Text(allergy, style: TextStyle(color: isSelected ? Colors.redAccent : Colors.white70)),
+                      child: Text(allergy, style: TextStyle(color: isSelected ? AppTheme.error : AppTheme.textDark, fontWeight: isSelected ? FontWeight.bold : FontWeight.w500)),
                     ),
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 30),
-              SizedBox(width: double.infinity, child: ElevatedButton(style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent), onPressed: () => Navigator.pop(context), child: const Text("SAVE OPTIONS"))),
+              const SizedBox(height: 40),
+              SizedBox(
+                width: double.infinity, 
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 20), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))), 
+                  onPressed: () => Navigator.pop(context), 
+                  child: const Text("SAVE ALLERGENS", style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1))
+                )
+              ),
+              const SizedBox(height: 10),
             ],
           ),
         ),
@@ -796,22 +965,49 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
       message: message,
       buttonText: "PROCEED ANYWAY",
       icon: LucideIcons.alertTriangle,
-      iconColor: Colors.redAccent,
+      iconColor: AppTheme.error,
       onPressed: onConfirm,
     );
   }
 
   void _showResetDialog(BuildContext context, WidgetRef ref) {
-    showElegantErrorDialog(
-      context,
-      title: "Reset Data",
-      message: "Are you sure you want to delete all food logs? This action cannot be undone.",
-      buttonText: "YES, RESET",
-      icon: LucideIcons.trash2,
-      iconColor: Colors.redAccent,
-      onPressed: () => ref.read(foodTrackerProvider.notifier).reset(),
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.surfaceWhite,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text("Reset Data", style: TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold)),
+        content: const Text("Are you sure you want to delete all food logs for today? This cannot be undone.", style: TextStyle(color: AppTheme.textMuted, height: 1.4)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("Cancel", style: TextStyle(color: AppTheme.textMuted))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            onPressed: () {
+              // ref.read(foodTrackerProvider.notifier).resetToday();
+              Navigator.pop(ctx);
+            },
+            child: const Text("Reset"),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildScanningOverlay() => Container(color: Colors.black87, child: const Center(child: CircularProgressIndicator(color: Colors.cyanAccent)));
+  Widget _buildScanningOverlay() {
+    return Container(
+      color: Colors.black.withOpacity(0.8),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(LucideIcons.scanLine, size: 60, color: Color(0xFF8B5CF6)).animate(onPlay: (c) => c.repeat(reverse: true)).scale(duration: 800.ms, begin: const Offset(1,1), end: const Offset(1.2,1.2)),
+            const SizedBox(height: 24),
+            const Text("AI is analyzing food...", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            const Text("Checking ingredients and measuring calories", style: TextStyle(color: Colors.white54)),
+          ],
+        ),
+      ),
+    ).animate().fadeIn(duration: 300.ms);
+  }
 }

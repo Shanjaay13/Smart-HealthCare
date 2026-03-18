@@ -4,10 +4,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:my_sejahtera_ng/core/providers/user_provider.dart';
 import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
-import 'package:my_sejahtera_ng/core/widgets/glass_container.dart';
 import 'package:my_sejahtera_ng/core/utils/ui_utils.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:my_sejahtera_ng/features/vaccine/screens/vaccine_setup_screen.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
@@ -45,7 +42,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               email: _usernameController.text.trim(),
               password: _passwordController.text.trim(),
               fullName: _nameController.text.trim(),
-              username: _usernameController.text.trim().split('@')[0], // Extract username from email
+              username: _usernameController.text.trim().split('@')[0],
               icNumber: _icController.text.trim(),
               phone: _phoneController.text.trim(),
               securityQuestion: _selectedSecurityQuestion,
@@ -60,7 +57,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           message: "Your account has been created. A verification link has been sent to your email. Please verify your email before logging in.",
           buttonText: "Go to Login",
           onPressed: () {
-            Navigator.pop(context); // Go back to login screen
+            Navigator.pop(context);
           },
         );
         
@@ -75,78 +72,58 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               backgroundColor: Colors.transparent,
               elevation: 0,
               insetPadding: const EdgeInsets.symmetric(horizontal: 20),
-              child: GlassContainer(
-                borderRadius: BorderRadius.circular(20),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppTheme.surfaceWhite,
+                  borderRadius: BorderRadius.circular(24),
+                ),
                 child: Padding(
-                  padding: const EdgeInsets.all(24.0),
+                  padding: const EdgeInsets.all(32.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: Colors.orangeAccent.withOpacity(0.1),
+                          color: AppTheme.warning.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(LucideIcons.userX, color: Colors.orangeAccent, size: 40),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        "Account Exists",
-                        style: GoogleFonts.outfit(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        "An account with this email is already registered. What would you like to do?",
-                        style: GoogleFonts.outfit(
-                          color: Colors.white70,
-                          fontSize: 16,
-                        ),
-                        textAlign: TextAlign.center,
+                        child: const Icon(LucideIcons.userX, color: AppTheme.warning, size: 48),
                       ),
                       const SizedBox(height: 24),
+                      Text(
+                        "Account Exists",
+                        style: Theme.of(context).textTheme.displayMedium,
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        "An account with this email is already registered. What would you like to do?",
+                        style: TextStyle(color: AppTheme.textMuted, fontSize: 16),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 32),
                       SizedBox(
                         width: double.infinity,
+                        height: 56,
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.accentTeal,
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
                           onPressed: () {
-                            Navigator.pop(ctx); // Close dialog
-                            Navigator.pop(context); // Go back to Login Screen
+                            Navigator.pop(ctx);
+                            Navigator.pop(context);
                           },
-                          child: Text(
-                            "Login Instead",
-                            style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),
-                          ),
+                          child: const Text("Login Instead"),
                         ),
                       ),
                       const SizedBox(height: 12),
                       SizedBox(
                         width: double.infinity,
+                        height: 56,
                         child: TextButton(
-                          style: TextButton.styleFrom(
-                            foregroundColor: Colors.white70,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                          ),
                           onPressed: () {
-                            Navigator.pop(ctx); // Close dialog
+                            Navigator.pop(ctx);
                             _usernameController.clear();
                           },
-                          child: Text(
-                            "Use Different Email",
-                            style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),
-                          ),
+                          child: const Text("Use Different Email", style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 16)),
                         ),
                       ),
                     ],
@@ -173,101 +150,94 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text("Create Account"),
-        leading: const BackButton(color: Colors.white),
       ),
-      body: Container(
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [AppTheme.primaryDark, AppTheme.primaryBlue],
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Form(
-              key: _formKey,
-              child: GlassContainer(
-                child: Column(
-                  children: [
-                    _buildTextField("Full Name", LucideIcons.user, _nameController),
-                    const SizedBox(height: 15),
-                    _buildTextField("IC Number", LucideIcons.creditCard, _icController, 
-                        validator: (val) {
-                          if (val == null || val.isEmpty) return "Required";
-                          if (!RegExp(r'^\d{6}-\d{2}-\d{4}$').hasMatch(val) && val.length < 12) return "Enter valid IC (e.g. 990101-14-1234)";
-                          return null;
-                        }),
-                    const SizedBox(height: 15),
-                    _buildTextField("Phone Number", LucideIcons.phone, _phoneController,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) return "Required";
-                          if (!RegExp(r'^\+?[\d\-\s]{9,15}$').hasMatch(val)) return "Enter valid phone number";
-                          return null;
-                        }),
-                    const SizedBox(height: 15),
-                    _buildTextField("Email", LucideIcons.mail, _usernameController,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) return "Required";
-                          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val)) return "Enter valid email";
-                          return null;
-                        }),
-                    const SizedBox(height: 15),
-                    _buildTextField("Password", LucideIcons.lock, _passwordController, isPassword: true,
-                        validator: (val) {
-                          if (val == null || val.isEmpty) return "Required";
-                          if (val.length < 6) return "At least 6 characters";
-                          return null;
-                        }),
-                    const SizedBox(height: 15),
-                    const Divider(color: Colors.white24),
-                    const SizedBox(height: 10),
-                    
-                    // Security Question Dropdown
-                    DropdownButtonFormField<String>(
-                      value: _selectedSecurityQuestion,
-                      dropdownColor: const Color(0xFF161B1E),
-                      style: const TextStyle(color: Colors.white),
-                      isExpanded: true, // Prevents text overflow
-                      decoration: InputDecoration(
-                        labelText: "Security Question",
-                        labelStyle: const TextStyle(color: Colors.white70),
-                        prefixIcon: const Icon(LucideIcons.shieldQuestion, color: Colors.white70),
-                        enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white30), borderRadius: BorderRadius.circular(12)),
-                        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: AppTheme.accentTeal), borderRadius: BorderRadius.circular(12)),
-                      ),
-                      items: _securityQuestions.map((q) => DropdownMenuItem(value: q, child: Text(q, overflow: TextOverflow.ellipsis, maxLines: 1))).toList(),
-                      onChanged: (val) => setState(() => _selectedSecurityQuestion = val!),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Container(
+              padding: const EdgeInsets.all(32),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceWhite,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
+                  )
+                ]
+              ),
+              child: Column(
+                children: [
+                  _buildTextField("Full Name", LucideIcons.user, _nameController),
+                  const SizedBox(height: 20),
+                  _buildTextField("IC Number", LucideIcons.creditCard, _icController, 
+                      validator: (val) {
+                        if (val == null || val.isEmpty) return "Required";
+                        if (!RegExp(r'^\d{6}-\d{2}-\d{4}$').hasMatch(val) && val.length < 12) return "Enter valid IC (e.g. 990101-14-1234)";
+                        return null;
+                      }),
+                  const SizedBox(height: 20),
+                  _buildTextField("Phone Number", LucideIcons.phone, _phoneController,
+                      validator: (val) {
+                        if (val == null || val.isEmpty) return "Required";
+                        if (!RegExp(r'^\+?[\d\-\s]{9,15}$').hasMatch(val)) return "Enter valid phone number";
+                        return null;
+                      }),
+                  const SizedBox(height: 20),
+                  _buildTextField("Email", LucideIcons.mail, _usernameController,
+                      validator: (val) {
+                        if (val == null || val.isEmpty) return "Required";
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(val)) return "Enter valid email";
+                        return null;
+                      }),
+                  const SizedBox(height: 20),
+                  _buildTextField("Password", LucideIcons.lock, _passwordController, isPassword: true,
+                      validator: (val) {
+                        if (val == null || val.isEmpty) return "Required";
+                        if (val.length < 6) return "At least 6 characters";
+                        return null;
+                      }),
+                  const SizedBox(height: 24),
+                  const Divider(color: Colors.black12),
+                  const SizedBox(height: 24),
+                  
+                  // Security Question Dropdown
+                  DropdownButtonFormField<String>(
+                    value: _selectedSecurityQuestion,
+                    dropdownColor: AppTheme.surfaceWhite,
+                    style: const TextStyle(color: AppTheme.textDark),
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: "Security Question",
+                      prefixIcon: Icon(LucideIcons.shieldQuestion, color: AppTheme.primaryBlue),
                     ),
+                    items: _securityQuestions.map((q) => DropdownMenuItem(value: q, child: Text(q, overflow: TextOverflow.ellipsis, maxLines: 1))).toList(),
+                    onChanged: (val) => setState(() => _selectedSecurityQuestion = val!),
+                  ),
 
-                    const SizedBox(height: 15),
-                    _buildTextField("Answer", LucideIcons.keyRound, _securityAnswerController,
-                        validator: (val) => val == null || val.isEmpty ? "Please answer the security question" : null),
-                    
-                    const SizedBox(height: 30),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? _handleSignUp : _handleSignUp,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.accentTeal,
-                          foregroundColor: AppTheme.primaryDark,
-                        ),
-                        child: _isLoading
-                            ? const CircularProgressIndicator()
-                            : const Text("Register", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      ),
+                  const SizedBox(height: 20),
+                  _buildTextField("Answer", LucideIcons.keyRound, _securityAnswerController,
+                      validator: (val) => val == null || val.isEmpty ? "Please answer the security question" : null),
+                  
+                  const SizedBox(height: 40),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _handleSignUp,
+                      child: _isLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : const Text("Register", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     ),
-                  ],
-                ),
-              ).animate().slideY(begin: 0.2, end: 0),
-            ),
+                  ),
+                ],
+              ),
+            ).animate().slideY(begin: 0.1, end: 0, duration: 600.ms, curve: Curves.easeOutCubic).fadeIn(),
           ),
         ),
       ),
@@ -278,20 +248,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     return TextFormField(
       controller: controller,
       obscureText: isPassword,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: AppTheme.textDark),
       validator: validator ?? (value) => value!.isEmpty ? "Required" : null,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white70),
-        prefixIcon: Icon(icon, color: Colors.white70),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: Colors.white30),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(color: AppTheme.accentTeal),
-          borderRadius: BorderRadius.circular(12),
-        ),
+        prefixIcon: Icon(icon, color: AppTheme.primaryBlue),
       ),
     );
   }

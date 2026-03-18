@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_sejahtera_ng/core/widgets/glass_container.dart';
+import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
 import 'package:my_sejahtera_ng/features/health_assistant/providers/appointment_provider.dart';
 import 'package:intl/intl.dart';
 
@@ -14,174 +14,174 @@ class AppointmentCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5), // Spacing for Carousel
-      child: GlassContainer(
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                const Color(0xFF00C6FF).withOpacity(0.1),
-                const Color(0xFF0072FF).withOpacity(0.05),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            border: Border.all(color: const Color(0xFF00C6FF).withOpacity(0.3)),
-            borderRadius: BorderRadius.circular(20),
+      margin: const EdgeInsets.symmetric(horizontal: 5),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        decoration: BoxDecoration(
+          color: const Color(0xFFEFF6FF),
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(50),
+            topRight: Radius.circular(20),
+            bottomLeft: Radius.circular(20),
+            bottomRight: Radius.circular(50),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF00C6FF).withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(LucideIcons.calendarClock, color: Color(0xFF00C6FF), size: 20),
+          border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.1)),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.primaryBlue.withOpacity(0.15),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
+            )
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryBlue.withOpacity(0.1),
+                          shape: BoxShape.circle,
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            "Upcoming Appointment",
-                            style: GoogleFonts.outfit(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                            maxLines: 2,
-                            overflow: TextOverflow.visible,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.greenAccent.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.greenAccent.withOpacity(0.5)),
-                    ),
-                    child: Text(
-                      "CONFIRMED",
-                      style: GoogleFonts.outfit(
-                        color: Colors.greenAccent,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
+                        child: const Icon(LucideIcons.calendarClock, color: AppTheme.primaryBlue, size: 20),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              
-              // Doctor & Hospital
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          appointment.doctorName,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          "Upcoming Appointment",
                           style: GoogleFonts.outfit(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 18,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          appointment.hospitalName,
-                          style: GoogleFonts.outfit(
-                            color: Colors.white70,
+                            color: AppTheme.primaryBlue,
+                            fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.visible,
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppTheme.success.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    "CONFIRMED",
+                    style: GoogleFonts.outfit(
+                      color: AppTheme.success,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                      letterSpacing: 1,
                     ),
                   ),
-                   // Action Buttons Row
-                   Column(
-                     crossAxisAlignment: CrossAxisAlignment.end,
-                     children: [
-                       TextButton(
-                         onPressed: () => _editTime(context, ref),
-                         style: TextButton.styleFrom(
-                           backgroundColor: Colors.blueAccent.withOpacity(0.1),
-                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                           shape: RoundedRectangleBorder(
-                             borderRadius: BorderRadius.circular(12),
-                             side: BorderSide(color: Colors.blueAccent.withOpacity(0.3)),
-                           ),
-                         ),
-                         child: Text(
-                           "Edit Time",
-                           style: GoogleFonts.outfit(
-                             color: Colors.blueAccent,
-                             fontWeight: FontWeight.bold,
-                             fontSize: 12,
-                           ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            
+            // Doctor & Hospital
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        appointment.doctorName,
+                        style: GoogleFonts.outfit(
+                          color: AppTheme.textDark,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 20,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        appointment.hospitalName,
+                        style: GoogleFonts.outfit(
+                          color: AppTheme.textMuted,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                 // Action Buttons Row
+                 Column(
+                   crossAxisAlignment: CrossAxisAlignment.end,
+                   children: [
+                     TextButton(
+                       onPressed: () => _editTime(context, ref),
+                       style: TextButton.styleFrom(
+                         backgroundColor: AppTheme.primaryBlue.withOpacity(0.05),
+                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(16),
                          ),
                        ),
-                       const SizedBox(height: 8),
-                       TextButton(
-                         onPressed: () => _confirmCancel(context, ref),
-                         style: TextButton.styleFrom(
-                           backgroundColor: Colors.redAccent.withOpacity(0.1),
-                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                           shape: RoundedRectangleBorder(
-                             borderRadius: BorderRadius.circular(12),
-                             side: BorderSide(color: Colors.redAccent.withOpacity(0.3)),
-                           ),
-                         ),
-                         child: Text(
-                           "Cancel",
-                           style: GoogleFonts.outfit(
-                             color: Colors.redAccent,
-                             fontWeight: FontWeight.bold,
-                             fontSize: 12,
-                           ),
+                       child: Text(
+                         "Edit Time",
+                         style: GoogleFonts.outfit(
+                           color: AppTheme.primaryBlue,
+                           fontWeight: FontWeight.bold,
+                           fontSize: 12,
                          ),
                        ),
-                     ],
-                   )
+                     ),
+                     const SizedBox(height: 8),
+                     TextButton(
+                       onPressed: () => _confirmCancel(context, ref),
+                       style: TextButton.styleFrom(
+                         backgroundColor: AppTheme.error.withOpacity(0.05),
+                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                         shape: RoundedRectangleBorder(
+                           borderRadius: BorderRadius.circular(16),
+                         ),
+                       ),
+                       child: Text(
+                         "Cancel",
+                         style: GoogleFonts.outfit(
+                           color: AppTheme.error,
+                           fontWeight: FontWeight.bold,
+                           fontSize: 12,
+                         ),
+                       ),
+                     ),
+                   ],
+                 )
+              ],
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // Date & Time Grid
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppTheme.bgLight,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildInfoColumn("Date", _formatDate(appointment.dateTime), LucideIcons.calendar),
+                  Container(width: 1, height: 30, color: Colors.grey.shade300),
+                  _buildInfoColumn("Time", _formatTime(appointment.dateTime), LucideIcons.clock),
+                  Container(width: 1, height: 30, color: Colors.grey.shade300),
+                  _buildInfoColumn("Service", appointment.type, LucideIcons.stethoscope),
                 ],
               ),
-              
-              const SizedBox(height: 16),
-              
-              // Date & Time Grid
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildInfoColumn("Date", _formatDate(appointment.dateTime), LucideIcons.calendar),
-                    Container(width: 1, height: 30, color: Colors.white10),
-                    _buildInfoColumn("Time", _formatTime(appointment.dateTime), LucideIcons.clock),
-                    Container(width: 1, height: 30, color: Colors.white10),
-                    _buildInfoColumn("Service", appointment.type, LucideIcons.stethoscope),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -191,15 +191,17 @@ class AppointmentCard extends ConsumerWidget {
     showDialog(
       context: context, 
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF1E293B),
-        title: const Text("Cancel Appointment?", style: TextStyle(color: Colors.white)),
-        content: Text("Are you sure you want to cancel your appointment at ${appointment.hospitalName}?", style: const TextStyle(color: Colors.white70)),
+        backgroundColor: AppTheme.surfaceWhite,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: const Text("Cancel Appointment?", style: TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold)),
+        content: Text("Are you sure you want to cancel your appointment at ${appointment.hospitalName}?", style: const TextStyle(color: AppTheme.textMuted)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx), 
-            child: const Text("Keep", style: TextStyle(color: Colors.white54))
+            child: const Text("Keep", style: TextStyle(color: AppTheme.textMuted))
           ),
-          TextButton(
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.error, foregroundColor: Colors.white),
             onPressed: () {
                ref.read(appointmentProvider.notifier).cancelAppointmentId(appointment.id);
                Navigator.pop(ctx);
@@ -207,7 +209,7 @@ class AppointmentCard extends ConsumerWidget {
                  const SnackBar(content: Text("Appointment cancelled."))
                );
             }, 
-            child: const Text("Yes, Cancel", style: TextStyle(color: Colors.redAccent))
+            child: const Text("Yes, Cancel")
           ),
         ],
       )
@@ -217,7 +219,6 @@ class AppointmentCard extends ConsumerWidget {
   Future<void> _editTime(BuildContext context, WidgetRef ref) async {
     try {
       final now = DateTime.now();
-      // Ensure initialDate is not before firstDate
       final DateTime safeInitialDate = appointment.dateTime.isBefore(now) ? now : appointment.dateTime;
       final DateTime safeFirstDate = appointment.dateTime.isBefore(now) ? appointment.dateTime : now;
 
@@ -228,12 +229,9 @@ class AppointmentCard extends ConsumerWidget {
         lastDate: now.add(const Duration(days: 365)),
         builder: (context, child) {
           return Theme(
-            data: ThemeData.dark().copyWith(
-              colorScheme: const ColorScheme.dark(
-                primary: Colors.blueAccent,
-                onPrimary: Colors.white,
-                surface: Color(0xFF1E293B),
-                onSurface: Colors.white,
+            data: ThemeData.light().copyWith(
+              colorScheme: const ColorScheme.light(
+                primary: AppTheme.primaryBlue,
               ),
             ),
             child: child!,
@@ -249,12 +247,9 @@ class AppointmentCard extends ConsumerWidget {
         initialTime: TimeOfDay.fromDateTime(appointment.dateTime),
         builder: (context, child) {
           return Theme(
-            data: ThemeData.dark().copyWith(
-              colorScheme: const ColorScheme.dark(
-                primary: Colors.blueAccent,
-                onPrimary: Colors.white,
-                surface: Color(0xFF1E293B),
-                onSurface: Colors.white,
+            data: ThemeData.light().copyWith(
+              colorScheme: const ColorScheme.light(
+                primary: AppTheme.primaryBlue,
               ),
             ),
             child: child!,
@@ -294,13 +289,13 @@ class AppointmentCard extends ConsumerWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, color: Colors.white54, size: 12),
+              Icon(icon, color: AppTheme.textMuted, size: 14),
               const SizedBox(width: 6),
-              Flexible(child: Text(label, style: GoogleFonts.outfit(color: Colors.white54, fontSize: 12), overflow: TextOverflow.ellipsis)),
+              Flexible(child: Text(label, style: GoogleFonts.outfit(color: AppTheme.textMuted, fontSize: 12), overflow: TextOverflow.ellipsis)),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(value, style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13), textAlign: TextAlign.center, overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 6),
+          Text(value, style: GoogleFonts.outfit(color: AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 13), textAlign: TextAlign.center, overflow: TextOverflow.ellipsis),
         ],
       ),
     );
@@ -311,7 +306,6 @@ class AppointmentCard extends ConsumerWidget {
   }
   
   String _formatDate(DateTime date) {
-    // Check if today
     final now = DateTime.now();
     if (date.year == now.year && date.month == now.month && date.day == now.day) {
       return "Today";

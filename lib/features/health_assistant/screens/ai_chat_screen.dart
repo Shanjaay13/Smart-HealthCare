@@ -15,6 +15,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:my_sejahtera_ng/core/providers/user_provider.dart';
+import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -886,7 +887,14 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                            "Is this correct?";
                       
                       msgType = 'summary'; 
-                      meta = {'show_change_button': true};
+                      meta = {
+                        'show_change_button': true,
+                        'appointmentType': state.tempBookingData['appointmentType'],
+                        'clinicName': state.tempBookingData['clinicName'],
+                        'selectedTime': state.tempBookingData['selectedTime']?.toIso8601String(),
+                        'phone': state.tempBookingData['phone'],
+                        'email': state.tempBookingData['email']
+                      };
                       notifier.setStep(7); // Jump to Confirmation
                 } else if (phone != null) {
                       // Have phone, missing email
@@ -896,7 +904,14 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                            notifier.updateTempData('email', email);
                            response = "Contact details:\nPhone: $phone\nEmail: $email\n\nConfirm?";
                            msgType = 'summary'; 
-                           meta = {'show_change_button': true};
+                           meta = {
+                             'show_change_button': true,
+                             'appointmentType': state.tempBookingData['appointmentType'],
+                             'clinicName': state.tempBookingData['clinicName'],
+                             'selectedTime': state.tempBookingData['selectedTime']?.toIso8601String(),
+                             'phone': state.tempBookingData['phone'],
+                             'email': state.tempBookingData['email']
+                           };
                         notifier.setStep(7);
                        } else {
                            response = "I have your phone ($phone). What is your email address?";
@@ -935,7 +950,16 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
             // Check if this is a confirmation "Yes" or "Proceed"
             if (userText.toLowerCase().contains("yes") || userText.toLowerCase().contains("confirm") || userText.toLowerCase().contains("proceed") || userText.toLowerCase().contains("ok")) {
                 response = "All done! Your appointment for **${state.tempBookingData['appointmentType']}** at **${state.tempBookingData['clinicName']}** is confirmed.";
-                msgType = 'summary'; // Final Summary
+                msgType = 'appointment_confirmed'; // Final Summary
+                meta = {
+                  'show_change_button': false,
+                  'appointmentType': state.tempBookingData['appointmentType'],
+                  'clinicName': state.tempBookingData['clinicName'],
+                  'selectedTime': state.tempBookingData['selectedTime']?.toIso8601String(),
+                  'phone': state.tempBookingData['phone'],
+                  'email': state.tempBookingData['email'],
+                  'price': state.tempBookingData['price']?.toString()
+                };
                 // Reset flow after confirmation? Usually handled by UI or provider
                 ref.read(appointmentProvider.notifier).confirmBooking();
             } else if (userText.toLowerCase().contains("change")) {
@@ -949,7 +973,16 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                     notifier.updateTempData('email', userText);
                     notifier.confirmBooking();
                     response = "Perfect. Appointment confirmed for **${state.tempBookingData['appointmentType']}**.\n\nWe sent a copy to **$userText**.";
-                    msgType = 'summary';
+                    msgType = 'appointment_confirmed';
+                    meta = {
+                      'show_change_button': false,
+                      'appointmentType': state.tempBookingData['appointmentType'],
+                      'clinicName': state.tempBookingData['clinicName'],
+                      'selectedTime': state.tempBookingData['selectedTime']?.toIso8601String(),
+                      'phone': state.tempBookingData['phone'],
+                      'email': state.tempBookingData['email'],
+                      'price': state.tempBookingData['price']?.toString()
+                    };
                  } else {
                     response = "Please type 'Yes' to confirm, or 'Change' to update details.";
                  }
@@ -1256,12 +1289,12 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
     final messages = ref.watch(chatProvider);
 
     return Scaffold(
-      backgroundColor: Colors.black, // Dark base
+      backgroundColor: AppTheme.bgLight,
       drawer: _buildHistoryDrawer(),
       body: Stack(
         children: [
-          // 1. Futuristic Background
-          const _FuturisticBackground(),
+          // 1. Minimalist Background
+          const _MinimalistBackground(),
 
           // 2. Chat Interface
           SafeArea(
@@ -1281,11 +1314,11 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                       final msg = messages[index];
                       // Greeting is usually index 0
                       bool isWelcome = index == 0 && !msg.isUser; 
-                      return _buildFuturisticMessage(msg, isWelcome: isWelcome);
+                      return _buildMinimalistMessage(msg, isWelcome: isWelcome);
                     },
                   )),
-                  _buildFuturisticSuggestions(),
-                  _buildFuturisticInput(),
+                  _buildMinimalistSuggestions(),
+                  _buildMinimalistInput(),
                 ]
               ],
             ),
@@ -1311,11 +1344,11 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
+                  color: AppTheme.surfaceWhite,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white24),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
                 ),
-                child: const Icon(LucideIcons.menu, color: Colors.white, size: 20),
+                child: const Icon(LucideIcons.menu, color: AppTheme.textDark, size: 20),
               ),
             ),
           ),
@@ -1326,7 +1359,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
               const Text(
                 "MySJ Assistant",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppTheme.textDark,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 0.5,
@@ -1338,12 +1371,12 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                     width: 6,
                     height: 6,
                     decoration: BoxDecoration(
-                      color: _useSimulatedAI ? Colors.orangeAccent : Colors.greenAccent,
+                      color: _useSimulatedAI ? const Color(0xFFF59E0B) : AppTheme.success,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: (_useSimulatedAI ? Colors.orangeAccent : Colors.greenAccent).withOpacity(0.6),
-                          blurRadius: 8,
+                          color: (_useSimulatedAI ? const Color(0xFFF59E0B) : AppTheme.success).withOpacity(0.4),
+                          blurRadius: 6,
                           spreadRadius: 2,
                         )
                       ]
@@ -1352,9 +1385,10 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                   const SizedBox(width: 8),
                   Text(
                     _useSimulatedAI ? "Offline Mode" : "Online • Llama 3",
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
+                    style: const TextStyle(
+                      color: AppTheme.textMuted,
                       fontSize: 12,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
@@ -1368,16 +1402,22 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
              onTap: () {
                ref.read(chatProvider.notifier).startNewSession();
                ScaffoldMessenger.of(context).showSnackBar(
-                 const SnackBar(content: Text("Started a new chat session"), duration: Duration(seconds: 1)),
+                 SnackBar(
+                   content: const Text("Started a new chat session", style: TextStyle(fontWeight: FontWeight.bold)), 
+                   backgroundColor: AppTheme.primaryBlue,
+                   behavior: SnackBarBehavior.floating,
+                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
                );
              },
              child: Container(
                padding: const EdgeInsets.all(8),
                decoration: BoxDecoration(
-                 color: Colors.white.withOpacity(0.1),
+                 color: AppTheme.surfaceWhite,
                  shape: BoxShape.circle,
+                 boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
                ),
-               child: const Icon(LucideIcons.plus, color: Colors.white, size: 20),
+               child: const Icon(LucideIcons.plus, color: AppTheme.primaryBlue, size: 20),
              ),
           ),
           const SizedBox(width: 10),
@@ -1395,20 +1435,21 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: _isMuted 
-                    ? Colors.white.withOpacity(0.1) 
-                    : (_isSpeaking ? Colors.purple.withOpacity(0.3) : Colors.white.withOpacity(0.1)),
+                    ? AppTheme.bgLight 
+                    : (_isSpeaking ? const Color(0xFF8B5CF6).withOpacity(0.1) : AppTheme.surfaceWhite),
                 shape: BoxShape.circle,
+                border: Border.all(color: _isMuted ? Colors.transparent : (_isSpeaking ? const Color(0xFF8B5CF6) : Colors.transparent)),
               ),
               child: Icon(
                 _isMuted 
                     ? LucideIcons.volumeX 
                     : (_isSpeaking ? LucideIcons.volume2 : LucideIcons.volume1),
                 color: _isMuted 
-                    ? Colors.grey 
-                    : (_isSpeaking ? Colors.purpleAccent : Colors.white70),
+                    ? AppTheme.textMuted 
+                    : (_isSpeaking ? const Color(0xFF8B5CF6) : AppTheme.primaryBlue),
                 size: 20,
               ),
-            ).animate(target: _isSpeaking && !_isMuted ? 1 : 0).scale(begin: const Offset(1,1), end: const Offset(1.2,1.2)),
+            ).animate(target: _isSpeaking && !_isMuted ? 1 : 0).scale(begin: const Offset(1,1), end: const Offset(1.1,1.1)),
           ),
           
           const SizedBox(width: 10),
@@ -1419,10 +1460,10 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.redAccent.withOpacity(0.2),
+                color: AppTheme.error.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(LucideIcons.x, color: Colors.redAccent, size: 20),
+              child: const Icon(LucideIcons.x, color: AppTheme.error, size: 20),
             ),
           ),
         ],
@@ -1430,7 +1471,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
     );
   }
 
-  Widget _buildFuturisticMessage(ChatMessage msg, {bool isWelcome = false}) {
+  Widget _buildMinimalistMessage(ChatMessage msg, {bool isWelcome = false}) {
     final isUser = msg.isUser;
     
     return Padding(
@@ -1442,19 +1483,15 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
           if (!isUser) ...[
             // AI Avatar
             Container(
-              width: 36, height: 36,
+              width: 38, height: 38,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const LinearGradient(colors: [Color(0xFF00C6FF), Color(0xFF0072FF)]),
+                color: AppTheme.primaryBlue,
                 boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF00C6FF).withOpacity(0.4),
-                    blurRadius: 10,
-                    spreadRadius: 2,
-                  )
+                  BoxShadow(color: AppTheme.primaryBlue.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))
                 ]
               ),
-              child: const Icon(LucideIcons.bot, color: Colors.white, size: 18),
+              child: const Icon(LucideIcons.bot, color: Colors.white, size: 20),
             ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
             const SizedBox(width: 12),
           ],
@@ -1467,25 +1504,21 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
                     color: isUser 
-                        ? const Color(0xFF4A00E0).withOpacity(0.9) // User text bg
-                        : Colors.white.withOpacity(0.08), // AI text glass
+                        ? AppTheme.primaryBlue 
+                        : AppTheme.surfaceWhite,
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(24),
                       topRight: const Radius.circular(24),
-                      bottomLeft: isUser ? const Radius.circular(24) : const Radius.circular(4),
-                      bottomRight: isUser ? const Radius.circular(4) : const Radius.circular(24),
+                      bottomLeft: isUser ? const Radius.circular(24) : const Radius.circular(6),
+                      bottomRight: isUser ? const Radius.circular(6) : const Radius.circular(24),
                     ),
-                    border: Border.all(
-                      color: isUser ? Colors.transparent : Colors.white.withOpacity(0.1),
-                      width: 1,
-                    ),
-                    gradient: isUser 
-                        ? const LinearGradient(colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)]) 
-                        : LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Colors.white.withOpacity(0.1), Colors.white.withOpacity(0.05)]
-                          ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5)
+                      )
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1495,11 +1528,11 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                           animatedTexts: [
                             TypewriterAnimatedText(
                               msg.text,
-                              textStyle: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                height: 1.4,
-                                fontWeight: FontWeight.w400,
+                              textStyle: TextStyle(
+                                color: isUser ? Colors.white : AppTheme.textDark,
+                                fontSize: 15,
+                                height: 1.5,
+                                fontWeight: FontWeight.w500,
                               ),
                               speed: const Duration(milliseconds: 30),
                             ),
@@ -1512,10 +1545,14 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                           data: msg.text,
                           selectable: true,
                           styleSheet: MarkdownStyleSheet(
-                            p: GoogleFonts.outfit(color: Colors.white, fontSize: 16, height: 1.6), // Increased readability
-                            strong: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold),
-                            em: GoogleFonts.outfit(color: Colors.white70, fontStyle: FontStyle.italic),
-                            listBullet: const TextStyle(color: Colors.white, fontSize: 16),
+                            p: GoogleFonts.outfit(color: isUser ? Colors.white : AppTheme.textDark, fontSize: 15, height: 1.5), 
+                            strong: GoogleFonts.outfit(color: isUser ? Colors.white : AppTheme.textDark, fontWeight: FontWeight.bold),
+                            em: GoogleFonts.outfit(color: isUser ? Colors.white70 : AppTheme.textMuted, fontStyle: FontStyle.italic),
+                            listBullet: TextStyle(color: isUser ? Colors.white : AppTheme.textDark, fontSize: 15),
+                            h1: GoogleFonts.outfit(color: isUser ? Colors.white : AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 20),
+                            h2: GoogleFonts.outfit(color: isUser ? Colors.white : AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 18),
+                            h3: GoogleFonts.outfit(color: isUser ? Colors.white : AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 16),
+                            code: const TextStyle(backgroundColor: AppTheme.bgLight, color: AppTheme.primaryBlue),
                           ),
                         ),
                         
@@ -1526,11 +1563,11 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                       if (msg.isError)
                         Padding(
                             padding: const EdgeInsets.only(top: 8),
-                            child: Text("System Error", style: TextStyle(color: Colors.redAccent.withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.bold))
+                            child: Text("System Error", style: TextStyle(color: AppTheme.error.withOpacity(0.8), fontSize: 10, fontWeight: FontWeight.bold))
                         )
                     ],
                   ),
-                ).animate().fade().slideY(begin: 0.3, end: 0, duration: 400.ms, curve: Curves.easeOut),
+                ).animate().fade().slideY(begin: 0.1, end: 0, duration: 400.ms, curve: Curves.easeOut),
 
                 // Render Action Button if Available
                 if (msg.actionWidget != null)
@@ -1555,8 +1592,8 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                   _buildTimeSlotPicker(msg.metaData!['slots'] as List<dynamic>),
 
                 // Render Appointment Summary
-                if (msg.type == 'summary') 
-                  _buildAppointmentSummary(),
+                if (msg.type == 'appointment_confirmed') 
+                  _buildAppointmentSummary(msg),
               ],
             ),
           ),
@@ -1564,19 +1601,15 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
           if (isUser) ...[
             const SizedBox(width: 12),
             Container(
-              width: 36, height: 36,
+              width: 38, height: 38,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: const LinearGradient(colors: [Color(0xFFFF3CAC), Color(0xFF784BA0)]),
+                color: const Color(0xFF10B981),
                 boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFFF3CAC).withOpacity(0.4),
-                    blurRadius: 10,
-                    spreadRadius: 2,
-                  )
+                  BoxShadow(color: const Color(0xFF10B981).withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))
                 ]
               ),
-              child: const Icon(LucideIcons.user, color: Colors.white, size: 18),
+              child: const Icon(LucideIcons.user, color: Colors.white, size: 20),
             ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
           ]
         ],
@@ -1594,13 +1627,14 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: AppTheme.surfaceWhite,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.2)),
+              border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.2)),
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 4))],
             ),
             child: Text(
               choice,
-              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold),
             ),
           ).animate().fadeIn().scale(),
         );
@@ -1614,30 +1648,30 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: AppTheme.surfaceWhite,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white10),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(
               width: 12, height: 12,
-              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF00C6FF)),
+              child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryBlue),
             ),
             const SizedBox(width: 10),
             Text(
               "Processing...",
-              style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+              style: TextStyle(color: AppTheme.textMuted.withOpacity(0.7), fontSize: 12, fontWeight: FontWeight.w600),
             ).animate(onPlay: (c) => c.repeat())
-            .shimmer(duration: 1500.ms, color: Colors.white),
+            .shimmer(duration: 1500.ms, color: AppTheme.primaryBlue),
           ],
         ),
       ),
     ).animate().fadeIn();
   }
 
-  Widget _buildFuturisticSuggestions() {
+  Widget _buildMinimalistSuggestions() {
     // Dynamic Chips based on Mode
     final List<String> chips;
     if (_useSimulatedAI) {
@@ -1676,15 +1710,14 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
               alignment: Alignment.center,
               decoration: BoxDecoration(
+                color: AppTheme.surfaceWhite,
                 borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
-                gradient: LinearGradient(
-                  colors: [Colors.white.withOpacity(0.1), Colors.white.withOpacity(0.05)]
-                )
+                border: Border.all(color: Colors.black.withOpacity(0.05)),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 5, offset: const Offset(0, 2))],
               ),
               child: Text(
                 chips[index],
-                style: const TextStyle(color: Colors.white, fontSize: 13),
+                style: const TextStyle(color: AppTheme.primaryBlue, fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
           ).animate().fade(delay: (100 * index).ms).slideX();
@@ -1693,20 +1726,18 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
     );
   }
 
-  Widget _buildFuturisticInput() {
+  Widget _buildMinimalistInput() {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 15, 20, 20),
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.6),
+        color: AppTheme.surfaceWhite,
         borderRadius: BorderRadius.circular(35),
-        border: Border.all(color: Colors.white.withOpacity(0.15)),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Colors.black45,
-            blurRadius: 15,
-            spreadRadius: 5,
-            offset: Offset(0, 10),
+            color: Colors.black.withOpacity(0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           )
         ]
       ),
@@ -1716,10 +1747,10 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
           Expanded(
             child: TextField(
               controller: _controller,
-              style: const TextStyle(color: Colors.white),
+              style: const TextStyle(color: AppTheme.textDark),
               decoration: InputDecoration(
                 hintText: "Ask AI Assistant...",
-                hintStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
+                hintStyle: TextStyle(color: AppTheme.textMuted.withOpacity(0.6)),
                 border: InputBorder.none,
                 isDense: true,
               ),
@@ -1729,7 +1760,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
           Container(
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              gradient: LinearGradient(colors: [Color(0xFF00C6FF), Color(0xFF0072FF)])
+              color: AppTheme.primaryBlue,
             ),
             child: IconButton(
               icon: const Icon(LucideIcons.send, color: Colors.white, size: 20),
@@ -1743,12 +1774,12 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
 
   Widget _buildClinicPicker(List<dynamic> clinics) {
     return Container(
-      height: 160, // Increased height for extra tags
+      height: 160,
       margin: const EdgeInsets.only(top: 10),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: clinics.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
         itemBuilder: (context, index) {
           final clinicRaw = clinics[index] as String;
           final parts = clinicRaw.split('|');
@@ -1761,11 +1792,11 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
             onTap: () => _sendMessage(clinicName),
             child: Container(
               width: 220,
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withOpacity(0.2)),
+                color: AppTheme.surfaceWhite,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 5))],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1776,33 +1807,33 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.blueAccent.withOpacity(0.2),
+                          color: AppTheme.primaryBlue.withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(LucideIcons.mapPin, color: Colors.blueAccent, size: 20),
+                        child: const Icon(LucideIcons.building, color: AppTheme.primaryBlue, size: 20),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           clinicName,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                          style: const TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 13),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 16),
                   // Details Row
                   Row(
                     children: [
-                      _buildMiniTag(LucideIcons.map, distance, Colors.grey),
-                      const SizedBox(width: 6),
-                      _buildMiniTag(LucideIcons.banknote, price, Colors.greenAccent),
+                      _buildMiniTag(LucideIcons.mapPin, distance, AppTheme.textMuted),
+                      const SizedBox(width: 8),
+                      _buildMiniTag(LucideIcons.banknote, price, AppTheme.success),
                     ],
                   ),
-                  const SizedBox(height: 6),
-                  _buildMiniTag(LucideIcons.clock, slots, Colors.orangeAccent),
+                  const SizedBox(height: 8),
+                  _buildMiniTag(LucideIcons.clock, slots, const Color(0xFFF59E0B)),
                 ],
               ),
             ),
@@ -1814,18 +1845,17 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
 
   Widget _buildMiniTag(IconData icon, String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 10, color: color),
-          const SizedBox(width: 4),
-          Text(label, style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w600)),
+          const SizedBox(width: 6),
+          Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -1842,18 +1872,19 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
         itemBuilder: (context, index) {
           final time = slots[index] as String;
           return GestureDetector(
-            onTap: () => _sendMessage(time), // Send the time as a message
+            onTap: () => _sendMessage(time),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.blueAccent.withOpacity(0.2),
+                color: AppTheme.surfaceWhite,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.blueAccent.withOpacity(0.5)),
+                border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.2)),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 4))],
               ),
               alignment: Alignment.center,
               child: Text(
                 time,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 13),
               ),
             ),
           ).animate().fadeIn().slideX(delay: (100 * index).ms);
@@ -1863,67 +1894,71 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
   }
 
   Widget _buildPreConfirmationSummary(ChatMessage msg) {
-    final state = ref.watch(appointmentProvider);
-    final showChangeButton = msg.metaData?['show_change_button'] == true;
+    final meta = msg.metaData ?? {};
+    final showChangeButton = meta['show_change_button'] == true;
 
     return Container(
       margin: const EdgeInsets.only(top: 10),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white12),
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 6))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(LucideIcons.clipboardCheck, color: showChangeButton ? Colors.amber : Colors.greenAccent, size: 24),
+              Icon(LucideIcons.clipboardCheck, color: showChangeButton ? const Color(0xFFF59E0B) : AppTheme.success, size: 24),
               const SizedBox(width: 10),
               Text(
                 showChangeButton ? "Review Details" : "Booking Confirmed",
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                style: const TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ],
           ),
-          const SizedBox(height: 15),
-          if (state.tempBookingData['appointmentType'] != null)
-             _buildSummaryRow(LucideIcons.calendar, "Type", state.tempBookingData['appointmentType']),
-          if (state.tempBookingData['clinicName'] != null)
-             _buildSummaryRow(LucideIcons.mapPin, "Clinic", state.tempBookingData['clinicName']),
-          if (state.tempBookingData['selectedTime'] != null)
-             _buildSummaryRow(LucideIcons.clock, "Time", DateFormat('dd MMM, hh:mm a').format(state.tempBookingData['selectedTime'])),
-          if (state.tempBookingData['phone'] != null)
-             _buildSummaryRow(LucideIcons.phone, "Phone", state.tempBookingData['phone']),
-          if (state.tempBookingData['email'] != null)
-             _buildSummaryRow(LucideIcons.mail, "Email", state.tempBookingData['email']),
+          const SizedBox(height: 20),
+          if (meta['appointmentType'] != null)
+             _buildSummaryRow(LucideIcons.calendar, "Type", meta['appointmentType']),
+          if (meta['clinicName'] != null)
+             _buildSummaryRow(LucideIcons.mapPin, "Clinic", meta['clinicName']),
+          if (meta['selectedTime'] != null)
+             _buildSummaryRow(LucideIcons.clock, "Time", DateFormat('dd MMM, hh:mm a').format(DateTime.parse(meta['selectedTime']))),
+          if (meta['phone'] != null)
+             _buildSummaryRow(LucideIcons.phone, "Phone", meta['phone']),
+          if (meta['email'] != null)
+             _buildSummaryRow(LucideIcons.mail, "Email", meta['email']),
           
           if (showChangeButton) ...[
-             const SizedBox(height: 20),
+             const SizedBox(height: 24),
              Row(
                children: [
                  Expanded(
                    child: OutlinedButton(
                      onPressed: () => _sendMessage("Change Details"),
                      style: OutlinedButton.styleFrom(
-                       side: const BorderSide(color: Colors.white30),
-                       foregroundColor: Colors.white,
-                       padding: const EdgeInsets.symmetric(vertical: 12),
+                       side: BorderSide(color: AppTheme.primaryBlue.withOpacity(0.2)),
+                       foregroundColor: AppTheme.primaryBlue,
+                       padding: const EdgeInsets.symmetric(vertical: 14),
+                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                      ),
-                     child: const Text("Change"),
+                     child: const Text("Change", style: TextStyle(fontWeight: FontWeight.bold)),
                    ),
                  ),
-                 const SizedBox(width: 10),
+                 const SizedBox(width: 12),
                  Expanded(
                    child: ElevatedButton(
                      onPressed: () => _sendMessage("Yes, Confirm"),
                      style: ElevatedButton.styleFrom(
-                       backgroundColor: Colors.greenAccent,
-                       foregroundColor: Colors.black,
-                       padding: const EdgeInsets.symmetric(vertical: 12),
+                       backgroundColor: AppTheme.primaryBlue,
+                       foregroundColor: Colors.white,
+                       padding: const EdgeInsets.symmetric(vertical: 14),
+                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                       elevation: 5,
+                       shadowColor: AppTheme.primaryBlue.withOpacity(0.4),
                      ),
-                     child: const Text("Confirm"),
+                     child: const Text("Confirm", style: TextStyle(fontWeight: FontWeight.bold)),
                    ),
                  ),
                ],
@@ -1934,53 +1969,61 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
     ).animate().fadeIn().slideY();
   }
 
-  Widget _buildAppointmentSummary() {
-    final appointment = ref.read(appointmentProvider).appointments.lastOrNull;
-    if (appointment == null) return const SizedBox.shrink();
+  Widget _buildAppointmentSummary(ChatMessage msg) {
+    final meta = msg.metaData ?? {};
     
-    final dateStr = DateFormat('EEE, d MMM @ h:mm a').format(appointment.dateTime);
+    final selectedTimeStr = meta['selectedTime'] as String?;
+    final dateStr = selectedTimeStr != null 
+        ? DateFormat('EEE, d MMM @ h:mm a').format(DateTime.parse(selectedTimeStr))
+        : 'Unknown Time';
 
     return Container(
       margin: const EdgeInsets.only(top: 10),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF00C6FF).withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF00C6FF).withOpacity(0.3)),
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.success.withOpacity(0.3)),
+        boxShadow: [BoxShadow(color: AppTheme.success.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 6))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(LucideIcons.calendarCheck, color: Color(0xFF00C6FF)),
-              const SizedBox(width: 8),
+              const Icon(LucideIcons.calendarCheck, color: AppTheme.success),
+              const SizedBox(width: 10),
               Text(
                 "Appointment Confirmed",
-                style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                style: GoogleFonts.outfit(color: AppTheme.success, fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          _buildSummaryRow(LucideIcons.user, "Doctor", appointment.doctorName),
-          _buildSummaryRow(LucideIcons.mapPin, "Location", appointment.hospitalName),
+          const SizedBox(height: 16),
+          _buildSummaryRow(LucideIcons.user, "Doctor", "Dr. Assigned"),
+          if (meta['clinicName'] != null)
+             _buildSummaryRow(LucideIcons.mapPin, "Location", meta['clinicName']),
           _buildSummaryRow(LucideIcons.clock, "Time", dateStr),
-          Container(height: 1, color: Colors.white10, margin: const EdgeInsets.symmetric(vertical: 8)),
-           _buildSummaryRow(LucideIcons.banknote, "Est. Price", "RM ${appointment.price.toStringAsFixed(2)}"),
+          Container(height: 1, color: Colors.black12, margin: const EdgeInsets.symmetric(vertical: 12)),
+          if (meta['price'] != null)
+             _buildSummaryRow(LucideIcons.banknote, "Est. Price", "RM ${double.tryParse(meta['price'])?.toStringAsFixed(2) ?? '50.00'}", valueColor: AppTheme.success),
         ],
       ),
     ).animate().fadeIn().slideY();
   }
 
-  Widget _buildSummaryRow(IconData icon, String label, String value) {
+  Widget _buildSummaryRow(IconData icon, String label, String value, {Color valueColor = AppTheme.textDark}) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 10),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: Colors.white60, size: 14),
-          const SizedBox(width: 8),
-          Text("$label: ", style: const TextStyle(color: Colors.white60, fontSize: 13)),
-          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+          Icon(icon, color: AppTheme.textMuted, size: 16),
+          const SizedBox(width: 10),
+          Text("$label: ", style: const TextStyle(color: AppTheme.textMuted, fontSize: 13, fontWeight: FontWeight.w600)),
+          Expanded(
+            child: Text(value, style: TextStyle(color: valueColor, fontWeight: FontWeight.bold, fontSize: 13)),
+          ),
         ],
       ),
     );
@@ -2002,7 +2045,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
   DateTime _parseTime(String timeStr) {
     try {
       final now = DateTime.now();
-      String cleanStr = timeStr.trim().toUpperCase(); // "TOMORROW 09:00 AM" or "09:00 AM"
+      String cleanStr = timeStr.trim().toUpperCase(); 
       
       int dayOffset = 0;
       if (cleanStr.contains("TOMORROW")) {
@@ -2012,10 +2055,8 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
         cleanStr = cleanStr.replaceAll("TODAY", "").trim();
       }
 
-      // now date part
       final dateBase = now.add(Duration(days: dayOffset));
 
-      // expected cleanStr: "09:00 AM"
       final parts = cleanStr.split(" "); 
       if (parts.length < 2) throw "Invalid Format";
 
@@ -2026,20 +2067,18 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
       bool isPM = parts[1] == "PM";
 
       if (isPM && hour != 12) hour += 12;
-      if (!isPM && hour == 12) hour = 0; // 12 AM is 00:00
+      if (!isPM && hour == 12) hour = 0; 
 
       return DateTime(dateBase.year, dateBase.month, dateBase.day, hour, minute);
     } catch (e) {
       debugPrint("Time Parse Error: $e");
-      // Fallback: Return now, but log error
       return DateTime.now();
     }
   }
 
-  // Minimal Animated Background Widget
   Widget _buildEmergencyOverlay() {
     return Container(
-      color: Colors.black.withOpacity(0.9), // Dark overlay
+      color: Colors.white.withOpacity(0.95), 
       child: Stack(
         children: [
           // Red Pulsing Background
@@ -2047,7 +2086,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
             child: Container(
               decoration: BoxDecoration(
                 gradient: RadialGradient(
-                  colors: [Colors.red.withOpacity(0.5), Colors.transparent],
+                  colors: [AppTheme.error.withOpacity(0.15), Colors.transparent],
                   radius: 1.5,
                 ),
               ),
@@ -2061,39 +2100,47 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                   const Icon(LucideIcons.siren, color: Colors.white, size: 80)
-                       .animate(onPlay: (c) => c.repeat())
-                       .shake(duration: 500.ms),
-                   const SizedBox(height: 20),
+                   Container(
+                     padding: const EdgeInsets.all(24),
+                     decoration: BoxDecoration(
+                       color: AppTheme.error.withOpacity(0.1),
+                       shape: BoxShape.circle,
+                     ),
+                     child: const Icon(LucideIcons.siren, color: AppTheme.error, size: 80)
+                         .animate(onPlay: (c) => c.repeat())
+                         .shake(duration: 500.ms),
+                   ),
+                   const SizedBox(height: 30),
                    Text(
                      "EMERGENCY DETECTED",
                      style: GoogleFonts.outfit(
-                       color: Colors.white, 
-                       fontSize: 32, 
+                       color: AppTheme.error, 
+                       fontSize: 30, 
                        fontWeight: FontWeight.w900,
                        letterSpacing: 2,
                      ),
                      textAlign: TextAlign.center,
                    ),
-                   const SizedBox(height: 10),
+                   const SizedBox(height: 12),
                    const Text(
                      "Help is just a tap away.",
-                     style: TextStyle(color: Colors.white70, fontSize: 16),
+                     style: TextStyle(color: AppTheme.textMuted, fontSize: 18, fontWeight: FontWeight.w500),
                    ),
-                   const SizedBox(height: 40),
+                   const SizedBox(height: 50),
                    
                    // Call 999 Button
                    SizedBox(
                      width: double.infinity,
-                     height: 60,
+                     height: 64,
                      child: ElevatedButton.icon(
                        icon: const Icon(LucideIcons.phoneCall, size: 28),
                        label: const Text("CALL 999 NOW", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                        style: ElevatedButton.styleFrom(
-                         backgroundColor: Colors.redAccent,
+                         backgroundColor: AppTheme.error,
                          foregroundColor: Colors.white,
-                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                          elevation: 10,
+                         shadowColor: AppTheme.error.withOpacity(0.5),
                        ),
                        onPressed: () async {
                           final Uri launchUri = Uri(scheme: 'tel', path: '999');
@@ -2104,22 +2151,23 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                      ),
                    ),
                    
-                   const SizedBox(height: 16),
+                   const SizedBox(height: 20),
                    
                    // Navigation Button
                    SizedBox(
                      width: double.infinity,
-                     height: 60,
+                     height: 64,
                      child: ElevatedButton.icon(
                        icon: const Icon(LucideIcons.navigation, size: 28),
                        label: const Text("NAVIGATE TO HOSPITAL", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                        style: ElevatedButton.styleFrom(
-                         backgroundColor: Colors.blueAccent,
-                         foregroundColor: Colors.white,
-                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                         backgroundColor: AppTheme.surfaceWhite,
+                         foregroundColor: AppTheme.error,
+                         side: BorderSide(color: AppTheme.error.withOpacity(0.3)),
+                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                         elevation: 0,
                        ),
                        onPressed: () async {
-                          // Simple Google Maps intent for "Hospital"
                           final Uri url = Uri.parse('https://www.google.com/maps/search/hospital/');
                           if (await canLaunchUrl(url)) {
                              await launchUrl(url);
@@ -2139,7 +2187,8 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                           isUser: false,
                         ));
                      },
-                     child: const Text("I'm Safe / Cancel Alert", style: TextStyle(color: Colors.white54)),
+                     style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12)),
+                     child: const Text("I'm Safe / Cancel Alert", style: TextStyle(color: AppTheme.textMuted, fontWeight: FontWeight.bold, fontSize: 16)),
                    ),
                 ],
               ),
@@ -2149,12 +2198,13 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
       ),
     );
   }
+  
   Widget _buildActionFromMeta(Map<String, dynamic> meta) {
     final label = meta['label'] ?? 'View';
     final colorVal = meta['color_value'] ?? 0xFF2196F3;
     final target = meta['target'] ?? '';
     final color = Color(colorVal);
-    
+
     Widget? destination;
     switch (target) {
       case 'check_in': destination = const CheckInScreen(); break;
@@ -2171,26 +2221,28 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
     }
     return const SizedBox.shrink();
   }
+
   Widget _buildHistoryDrawer() {
     return Drawer(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppTheme.surfaceWhite,
       child: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
              Padding(
-               padding: const EdgeInsets.all(16.0),
-               child: Text("Chat History", style: GoogleFonts.outfit(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+               padding: const EdgeInsets.all(24.0),
+               child: Text("Chat History", style: GoogleFonts.outfit(color: AppTheme.textDark, fontSize: 22, fontWeight: FontWeight.bold)),
              ),
-             const Divider(color: Colors.white24),
+             const Divider(color: Colors.black12, height: 1),
              Expanded(
                child: FutureBuilder<List<ChatSessionModel>>(
                  future: ref.read(chatProvider.notifier).fetchHistory(),
                  builder: (context, snapshot) {
                    if (snapshot.connectionState == ConnectionState.waiting) {
-                     return const Center(child: CircularProgressIndicator());
+                     return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
                    }
                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                     return const Center(child: Text("No history yet", style: TextStyle(color: Colors.white54)));
+                     return const Center(child: Text("No history yet", style: TextStyle(color: AppTheme.textMuted)));
                    }
                    
                    final sessions = snapshot.data!;
@@ -2201,46 +2253,53 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                        final isCurrent = session.id == ref.read(chatProvider.notifier).currentSessionId;
                        
                        return ListTile(
-                         title: Text(session.title, style: TextStyle(color: isCurrent ? Colors.blueAccent : Colors.white70), maxLines: 1, overflow: TextOverflow.ellipsis),
-                         subtitle: Text(DateFormat.MMMd().format(session.createdAt), style: const TextStyle(color: Colors.white30, fontSize: 10)),
+                         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+                         title: Text(session.title, style: TextStyle(color: isCurrent ? AppTheme.primaryBlue : AppTheme.textDark, fontWeight: isCurrent ? FontWeight.bold : FontWeight.w500), maxLines: 1, overflow: TextOverflow.ellipsis),
+                         subtitle: Text(DateFormat.MMMd().format(session.createdAt), style: const TextStyle(color: AppTheme.textMuted, fontSize: 11)),
                          onTap: () {
                            ref.read(chatProvider.notifier).loadSession(session.id);
-                           Navigator.pop(context); // Close drawer
+                           Navigator.pop(context); 
                          },
                          trailing: IconButton(
-                           icon: const Icon(LucideIcons.trash2, color: Colors.white24, size: 16),
+                           icon: const Icon(LucideIcons.trash2, color: AppTheme.textMuted, size: 18),
                            onPressed: () {
                              showDialog(
                                context: context,
                                builder: (ctx) => AlertDialog(
-                                 backgroundColor: const Color(0xFF161B1E),
+                                 backgroundColor: AppTheme.surfaceWhite,
+                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                                  title: Row(
                                    children: [
-                                     const Icon(LucideIcons.alertTriangle, color: Colors.redAccent),
-                                     const SizedBox(width: 10),
-                                     const Text("Delete Chat", style: TextStyle(color: Colors.white)),
+                                     Container(
+                                       padding: const EdgeInsets.all(8),
+                                       decoration: BoxDecoration(color: AppTheme.error.withOpacity(0.1), shape: BoxShape.circle),
+                                       child: const Icon(LucideIcons.alertTriangle, color: AppTheme.error, size: 20)
+                                     ),
+                                     const SizedBox(width: 12),
+                                     const Text("Delete Chat", style: TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 18)),
                                    ],
                                  ),
                                  content: const Text(
                                    "Are you sure you want to delete this chat session? This action cannot be undone.",
-                                   style: TextStyle(color: Colors.white70),
+                                   style: TextStyle(color: AppTheme.textMuted, height: 1.5),
                                  ),
                                  actions: [
                                    TextButton(
                                      onPressed: () => Navigator.pop(ctx),
-                                     child: const Text("CANCEL", style: TextStyle(color: Colors.white54)),
+                                     child: const Text("CANCEL", style: TextStyle(color: AppTheme.textMuted, fontWeight: FontWeight.bold)),
                                    ),
                                    ElevatedButton(
                                      style: ElevatedButton.styleFrom(
-                                       backgroundColor: Colors.redAccent,
+                                       backgroundColor: AppTheme.error,
                                        foregroundColor: Colors.white,
+                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))
                                      ),
                                      onPressed: () async {
                                         Navigator.pop(ctx);
                                         await ref.read(chatProvider.notifier).deleteSession(session.id);
-                                        if (mounted) setState(() {}); // Refresh drawer
+                                        if (mounted) setState(() {}); 
                                      },
-                                     child: const Text("DELETE"),
+                                     child: const Text("DELETE", style: TextStyle(fontWeight: FontWeight.bold)),
                                    ),
                                  ],
                                ),
@@ -2260,59 +2319,39 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
   }
 }
 
-class _FuturisticBackground extends StatelessWidget {
-  const _FuturisticBackground();
+class _MinimalistBackground extends StatelessWidget {
+  const _MinimalistBackground();
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        // Deep Space Base
-        Container(color: const Color(0xFF0F172A)), // Slate 900
+        Container(color: AppTheme.bgLight),
         
-        // Glowing Orb 1 (Top Left)
         Positioned(
           top: -100, left: -100,
           child: Container(
             width: 400, height: 400,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFF4A00E0).withOpacity(0.3),
-              backgroundBlendMode: BlendMode.screen,
+              color: AppTheme.primaryBlue.withOpacity(0.03),
             ),
           ).animate(onPlay: (c) => c.repeat(reverse: true))
-           .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 4000.ms)
-           .blur(begin: const Offset(60, 60), end: const Offset(100, 100)),
+           .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 4000.ms)
+           .blur(begin: const Offset(40, 40), end: const Offset(60, 60)),
         ),
 
-        // Glowing Orb 2 (Bottom Right)
         Positioned(
           bottom: -100, right: -100,
           child: Container(
             width: 300, height: 300,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFF00C6FF).withOpacity(0.2),
-              backgroundBlendMode: BlendMode.screen,
+              color: const Color(0xFF10B981).withOpacity(0.02),
             ),
           ).animate(onPlay: (c) => c.repeat(reverse: true))
-           .moveY(begin: 0, end: -50, duration: 5000.ms)
-           .blur(begin: const Offset(80, 80), end: const Offset(40, 40)),
-        ),
-        
-
-        // Overlay Noise/Texture
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withOpacity(0.2),
-                Colors.black.withOpacity(0.6),
-              ],
-            ),
-          ),
+           .moveY(begin: 0, end: -30, duration: 5000.ms)
+           .blur(begin: const Offset(50, 50), end: const Offset(30, 30)),
         ),
       ],
     );

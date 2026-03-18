@@ -55,12 +55,15 @@ class NextAppointmentCard extends ConsumerWidget {
                         child: const Icon(LucideIcons.calendarClock, color: Color(0xFF00C6FF), size: 20),
                       ),
                       const SizedBox(width: 12),
-                      Text(
-                        "Upcoming Appointment",
-                        style: GoogleFonts.outfit(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                      Expanded(
+                        child: Text(
+                          "Upcoming Appointment",
+                          style: GoogleFonts.outfit(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],

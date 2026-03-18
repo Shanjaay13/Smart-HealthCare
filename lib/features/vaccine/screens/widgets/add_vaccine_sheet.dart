@@ -224,12 +224,12 @@ class _AddVaccineSheetState extends ConsumerState<AddVaccineSheet> {
                         onPressed: _isLoading ? null : _saveRecord,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.accentTeal,
-                          foregroundColor: AppTheme.primaryDark,
+                          foregroundColor: AppTheme.primaryBlue,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         child: _isLoading
-                            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryDark))
+                            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryBlue))
                             : const Text("Save Record", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                       ),
                     ),

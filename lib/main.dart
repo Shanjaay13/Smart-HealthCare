@@ -26,26 +26,11 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentThemeId = ref.watch(themeProvider);
     
-    ThemeData themeData;
-    switch (currentThemeId) {
-      case 'cyberpunk':
-        themeData = AppTheme.cyberpunkTheme;
-        break;
-      case 'nature':
-        themeData = AppTheme.natureTheme;
-        break;
-      case 'sunset':
-        themeData = AppTheme.sunsetTheme;
-        break;
-      case 'ocean':
-        themeData = AppTheme.oceanTheme;
-        break;
-      default:
-        themeData = AppTheme.lightTheme;
-    }
+    // Enforce Clean Minimalist Theme for the Revamp
+    final themeData = AppTheme.lightTheme;
 
     return MaterialApp(
-      title: 'MySejahtera NextGen',
+      title: 'Smart HealthCare',
       debugShowCheckedModeBanner: false,
       theme: themeData,
       // Temporarily disable darkTheme switch for custom themes to force the selected one

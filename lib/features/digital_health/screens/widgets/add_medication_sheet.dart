@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -6,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:my_sejahtera_ng/features/digital_health/models/medication.dart';
 import 'package:my_sejahtera_ng/core/utils/ui_utils.dart';
+import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
 
 class AddMedicationSheet extends StatefulWidget {
   final Future<void> Function(Medication) onSave;
@@ -65,14 +65,13 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
       initialTime: TimeOfDay.fromDateTime(_selectedTime),
       builder: (context, child) {
         return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Colors.blueAccent,
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: AppTheme.primaryBlue,
               onPrimary: Colors.white,
-              surface: Color(0xFF1E1E1E),
-              onSurface: Colors.white,
+              surface: AppTheme.surfaceWhite,
+              onSurface: AppTheme.textDark,
             ),
-            dialogBackgroundColor: const Color(0xFF1E1E1E),
           ),
           child: child!,
         );
@@ -96,17 +95,9 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
         right: 24,
         top: 24,
       ),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F2027).withOpacity(0.95), // Deep dark background
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
-        border: Border(top: BorderSide(color: Colors.white.withOpacity(0.1), width: 1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blueAccent.withOpacity(0.2),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
-          )
-        ]
+      decoration: const BoxDecoration(
+        color: AppTheme.surfaceWhite,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
       child: Form(
         key: _formKey,
@@ -121,7 +112,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white24,
+                    color: Colors.black12,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -133,14 +124,14 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                   Text(
                     widget.initialData == null ? "Add Medication" : "Edit Medication",
                     style: GoogleFonts.outfit(
-                      color: Colors.white,
+                      color: AppTheme.textDark,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ).animate().fadeIn().slideY(begin: 0.3),
                   if (widget.onDelete != null)
                     IconButton(
-                      icon: const Icon(LucideIcons.trash2, color: Colors.redAccent),
+                      icon: const Icon(LucideIcons.trash2, color: AppTheme.error),
                       onPressed: () async {
                         await widget.onDelete!();
                         if (context.mounted) Navigator.pop(context);
@@ -151,7 +142,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
               const SizedBox(height: 5),
               Text(
                 widget.initialData == null ? "Set reminders to stay on track." : "Update your medication details.",
-                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 14),
+                style: const TextStyle(color: AppTheme.textMuted, fontSize: 14),
               ).animate().fadeIn().slideY(begin: 0.3, delay: 100.ms),
               const SizedBox(height: 30),
 
@@ -196,9 +187,8 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
               // Toggle: Specific Time vs Timer
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.05),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white10),
+                  color: AppTheme.bgLight,
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   children: [
@@ -209,12 +199,12 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                           duration: 300.ms,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: !_isTimerMode ? Colors.blueAccent.withOpacity(0.2) : Colors.transparent,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: !_isTimerMode ? Colors.blueAccent : Colors.transparent),
+                            color: !_isTimerMode ? AppTheme.primaryBlue.withOpacity(0.1) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: !_isTimerMode ? AppTheme.primaryBlue : Colors.transparent),
                           ),
                           alignment: Alignment.center,
-                          child: Text("Specific Time", style: TextStyle(color: !_isTimerMode ? Colors.blueAccent : Colors.white54, fontWeight: FontWeight.bold)),
+                          child: Text("Specific Time", style: TextStyle(color: !_isTimerMode ? AppTheme.primaryBlue : AppTheme.textMuted, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ),
@@ -225,12 +215,12 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                           duration: 300.ms,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: _isTimerMode ? Colors.orangeAccent.withOpacity(0.2) : Colors.transparent,
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: _isTimerMode ? Colors.orangeAccent : Colors.transparent),
+                            color: _isTimerMode ? const Color(0xFFF59E0B).withOpacity(0.1) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: _isTimerMode ? const Color(0xFFF59E0B) : Colors.transparent),
                           ),
                           alignment: Alignment.center,
-                          child: Text("Timer (Countdown)", style: TextStyle(color: _isTimerMode ? Colors.orangeAccent : Colors.white54, fontWeight: FontWeight.bold)),
+                          child: Text("Timer (Countdown)", style: TextStyle(color: _isTimerMode ? const Color(0xFFF59E0B) : AppTheme.textMuted, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ),
@@ -264,45 +254,42 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                      // Wrap in async function immediately executed
                       () async {
                         try {
-                           // Calculate Time
                           DateTime finalTime = _selectedTime;
                           if (_isTimerMode) {
                             finalTime = DateTime.now().add(Duration(minutes: _selectedDurationMinutes));
                           }
                           
-                          final Medication medToSave;
-                          medToSave = Medication(
+                          final Medication medToSave = Medication(
                             id: widget.initialData?.id,
                             name: _nameController.text.isEmpty ? "Quick Timer" : _nameController.text,
                             dosage: _dosageController.text.isEmpty ? "General" : _dosageController.text,
                             pillsToTake: int.tryParse(_pillsController.text) ?? 1,
                             time: finalTime,
-                            instructions: _instructionsController.text, // Simplified
+                            instructions: _instructionsController.text, 
                             isOneTime: _isTimerMode,
-                            isTaken: widget.initialData?.isTaken ?? false, // Preserve taken state
+                            isTaken: widget.initialData?.isTaken ?? false, 
                           );
                           
-                          await widget.onSave(medToSave); // Await the save operation
+                          await widget.onSave(medToSave); 
                           
                           if (!context.mounted) return;
                           
                           // Show Feedback
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              backgroundColor: _isTimerMode ? Colors.orangeAccent : Colors.blueAccent,
+                              backgroundColor: _isTimerMode ? const Color(0xFFF59E0B) : AppTheme.primaryBlue,
                               content: Row(
                                 children: [
-                                  Icon(_isTimerMode ? LucideIcons.timer : LucideIcons.bell, color: Colors.white),
+                                  Icon(_isTimerMode ? LucideIcons.timer : LucideIcons.bell, color: Colors.white, size: 20),
                                   const SizedBox(width: 10),
                                   Expanded(
                                     child: Text(
                                       _isTimerMode 
                                         ? "Timer set for ${_selectedDurationMinutes}m! We'll remind you." 
                                         : "Reminder set for ${DateFormat.jm().format(finalTime)} daily.",
-                                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold)
+                                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white)
                                     ),
                                   ),
                                 ],
@@ -325,18 +312,18 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                       }();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
+                    backgroundColor: AppTheme.primaryBlue,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 20),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 5,
-                    shadowColor: Colors.blueAccent.withOpacity(0.5),
+                    shadowColor: AppTheme.primaryBlue.withOpacity(0.4),
                   ),
                   child: Text(
                     "Save & Notify Me",
-                    style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ).animate().fadeIn().scale(delay: 600.ms),
@@ -361,60 +348,48 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: AppTheme.textDark),
       decoration: InputDecoration(
         filled: true,
-        fillColor: Colors.white.withOpacity(0.05),
+        fillColor: AppTheme.bgLight,
         labelText: label,
-        labelStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+        labelStyle: const TextStyle(color: AppTheme.textMuted),
         hintText: hint,
-        hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
-        prefixIcon: Icon(icon, color: Colors.white54),
+        hintStyle: TextStyle(color: AppTheme.textMuted.withOpacity(0.7)),
+        prefixIcon: Icon(icon, color: AppTheme.textMuted),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide.none,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.white10),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.blueAccent),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.redAccent),
-        ),
       ),
     );
   }
+  
   Widget _buildTimePicker() {
     return GestureDetector(
       onTap: () => _selectTime(context),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
+          color: AppTheme.bgLight,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white10),
         ),
         child: Row(
           children: [
-            const Icon(LucideIcons.clock, color: Colors.blueAccent),
+            const Icon(LucideIcons.clock, color: AppTheme.primaryBlue),
             const SizedBox(width: 16),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Daily Reminder at", style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12)),
+                const Text("Daily Reminder at", style: TextStyle(color: AppTheme.textMuted, fontSize: 13, fontWeight: FontWeight.w600)),
                 Text(
                   DateFormat.jm().format(_selectedTime),
-                  style: GoogleFonts.outfit(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.outfit(color: AppTheme.textDark, fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
             const Spacer(),
-            const Icon(LucideIcons.chevronDown, color: Colors.white24),
+            const Icon(LucideIcons.chevronDown, color: AppTheme.textMuted),
           ],
         ),
       ),
@@ -425,30 +400,30 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Text("Remind me in:", style: TextStyle(color: Colors.orangeAccent, fontSize: 12, fontWeight: FontWeight.bold)),
+        const Padding(
+          padding: EdgeInsets.only(bottom: 12),
+          child: Text("Remind me in:", style: TextStyle(color: Color(0xFFF59E0B), fontSize: 13, fontWeight: FontWeight.bold)),
         ),
         Wrap(
-          spacing: 10,
-          runSpacing: 10,
+          spacing: 12,
+          runSpacing: 12,
           children: [2, 5, 15, 30, 60, 120].map((mins) {
              final isSelected = _selectedDurationMinutes == mins;
              return GestureDetector(
                onTap: () => setState(() => _selectedDurationMinutes = mins),
                child: AnimatedContainer(
                  duration: 200.ms,
-                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                  decoration: BoxDecoration(
-                   color: isSelected ? Colors.orangeAccent : Colors.white.withOpacity(0.05),
+                   color: isSelected ? const Color(0xFFF59E0B) : AppTheme.bgLight,
                    borderRadius: BorderRadius.circular(12),
-                   border: Border.all(color: isSelected ? Colors.orangeAccent : Colors.white10),
-                   boxShadow: isSelected ? [BoxShadow(color: Colors.orangeAccent.withOpacity(0.4), blurRadius: 8)] : []
+                   border: Border.all(color: isSelected ? const Color(0xFFF59E0B) : Colors.transparent),
+                   boxShadow: isSelected ? [BoxShadow(color: const Color(0xFFF59E0B).withOpacity(0.3), blurRadius: 8)] : []
                  ),
                  child: Text(
                    mins >= 60 ? "${mins ~/ 60} hr" : "$mins min",
                    style: GoogleFonts.outfit(
-                     color: isSelected ? Colors.black : Colors.white,
+                     color: isSelected ? Colors.white : AppTheme.textDark,
                      fontWeight: FontWeight.bold,
                    ),
                  ),
