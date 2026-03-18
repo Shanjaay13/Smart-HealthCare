@@ -58,49 +58,22 @@ class DashboardScreen extends ConsumerWidget {
                 const SizedBox(width: 16),
               ],
             ),
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  
-                  // Medical ID
-                  Text(
-                    "Medical Profile",
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 20),
-                  ).animate().fadeIn(delay: 150.ms),
-                  const SizedBox(height: 16),
-                  const HoloIdCard().animate().fadeIn(delay: 200.ms).slideY(begin: 0.1, end: 0, duration: 600.ms, curve: Curves.easeOutCubic),
-                  
-                  const SizedBox(height: 32),
-
-                  // Appointments
-                  const UpcomingAppointmentsCarousel().animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
-                  
-                  // Weekly Insights
-                  const HealthInsightBanner().animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0),
-                  
-                  const SizedBox(height: 24),
-                  
-                  // Calorie Widget
-                  const CalorieInsightCard().animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
-
-                  const SizedBox(height: 32),
-                  
-                  // Quick Access Menu
-                  Text(
-                    "Quick Access",
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(fontSize: 20),
-                  ).animate().fadeIn(delay: 600.ms),
-                  const SizedBox(height: 16),
-                  _buildOrganicQuickAccess(context, ref).animate().fadeIn(delay: 700.ms).slideY(begin: 0.1, end: 0),
-                  
-                  const SizedBox(height: 32),
-
-                  // Gamified Quests
-                  const QuestBoard().animate().fadeIn(delay: 800.ms).slideY(begin: 0.1, end: 0),
-
-                  const SizedBox(height: 100), // Spacing for FAB
-                ]),
+            SliverToBoxAdapter(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isDesktop = constraints.maxWidth > 850;
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1100),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        child: isDesktop 
+                            ? _buildDesktopLayout(context, ref)
+                            : _buildMobileLayout(context, ref),
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -124,21 +97,110 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildMobileLayout(BuildContext context, WidgetRef ref) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildSectionTitle(context, "Medical Profile").animate().fadeIn(delay: 100.ms).slideX(begin: -0.1, end: 0),
+        const SizedBox(height: 16),
+        const HoloIdCard().animate().fadeIn(delay: 200.ms).slideY(begin: 0.1, end: 0, duration: 800.ms, curve: Curves.easeOutCubic).scale(begin: const Offset(0.9, 0.9), delay: 200.ms),
+        
+        const SizedBox(height: 32),
+        const UpcomingAppointmentsCarousel().animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0).flipH(begin: 0.1, end: 0),
+        
+        const SizedBox(height: 16),
+        const HealthInsightBanner().animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0).shimmer(delay: 1.seconds, duration: 2.seconds, blendMode: BlendMode.overlay, color: Colors.white24),
+        
+        const SizedBox(height: 24),
+        const CalorieInsightCard().animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
+
+        const SizedBox(height: 32),
+        _buildSectionTitle(context, "Quick Access").animate().fadeIn(delay: 600.ms).slideX(begin: -0.1, end: 0),
+        const SizedBox(height: 24),
+        _buildOrganicQuickAccess(context, ref).animate().fadeIn(delay: 700.ms).slideY(begin: 0.1, end: 0),
+        
+        const SizedBox(height: 48),
+        const QuestBoard().animate().fadeIn(delay: 800.ms).slideY(begin: 0.1, end: 0),
+        const SizedBox(height: 100),
+      ],
+    );
+  }
+
+  Widget _buildDesktopLayout(BuildContext context, WidgetRef ref) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Left Column (ID + Insights)
+            Expanded(
+              flex: 5,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildSectionTitle(context, "Medical Profile").animate().fadeIn(delay: 100.ms).slideX(begin: -0.1, end: 0),
+                  const SizedBox(height: 16),
+                  const HoloIdCard().animate().fadeIn(delay: 200.ms).slideY(begin: 0.1, end: 0, duration: 1000.ms, curve: Curves.easeOutCubic).scale(begin: const Offset(0.9, 0.9)),
+                  
+                  const SizedBox(height: 32),
+                  const HealthInsightBanner().animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0).flipH(begin: -0.05, end: 0),
+                  
+                  const SizedBox(height: 32),
+                  const CalorieInsightCard().animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
+                ],
+              ),
+            ),
+            const SizedBox(width: 40),
+            // Right Column (Appointments + Quick Access + Quests)
+            Expanded(
+              flex: 4,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const UpcomingAppointmentsCarousel().animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
+                  const SizedBox(height: 24),
+                  
+                  _buildSectionTitle(context, "Quick Access").animate().fadeIn(delay: 600.ms).slideX(begin: -0.1, end: 0),
+                  const SizedBox(height: 24),
+                  _buildOrganicQuickAccess(context, ref).animate().fadeIn(delay: 700.ms).slideY(begin: 0.1, end: 0),
+                  
+                  const SizedBox(height: 48),
+                  const QuestBoard().animate().fadeIn(delay: 800.ms).slideY(begin: 0.1, end: 0),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 100),
+      ],
+    );
+  }
+
+  Widget _buildSectionTitle(BuildContext context, String title) {
+    return Text(
+      title,
+      style: Theme.of(context).textTheme.displayMedium?.copyWith(
+        fontSize: 22,
+        fontWeight: FontWeight.w900,
+        color: AppTheme.textDark,
+        letterSpacing: -0.5,
+      ),
+    );
+  }
+
   Widget _buildOrganicQuickAccess(BuildContext context, WidgetRef ref) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
-      child: Wrap(
-        spacing: 16,
-        runSpacing: 16,
-        alignment: WrapAlignment.center,
-        children: [
-          _buildActionCircle(context, ref, 'Check-In', LucideIcons.qrCode, AppTheme.primaryBlue),
-          _buildActionCircle(context, ref, 'Vaccine', LucideIcons.syringe, const Color(0xFF10B981)),
-          _buildActionCircle(context, ref, 'Hotspots', LucideIcons.mapPin, const Color(0xFFF59E0B)),
-          _buildActionCircle(context, ref, 'Health', LucideIcons.stethoscope, const Color(0xFFEC4899)),
-          _buildActionCircle(context, ref, 'Food', LucideIcons.apple, const Color(0xFF8B5CF6)),
-        ],
-      )
+    return Wrap(
+      spacing: 24,
+      runSpacing: 24,
+      alignment: WrapAlignment.center,
+      children: [
+        _buildActionCircle(context, ref, 'Check-In', LucideIcons.qrCode, AppTheme.primaryBlue),
+        _buildActionCircle(context, ref, 'Vaccine', LucideIcons.syringe, const Color(0xFF10B981)),
+        _buildActionCircle(context, ref, 'Hotspots', LucideIcons.mapPin, const Color(0xFFF59E0B)),
+        _buildActionCircle(context, ref, 'Health', LucideIcons.stethoscope, const Color(0xFFEC4899)),
+        _buildActionCircle(context, ref, 'Food', LucideIcons.apple, const Color(0xFF8B5CF6)),
+      ],
     );
   }
 
