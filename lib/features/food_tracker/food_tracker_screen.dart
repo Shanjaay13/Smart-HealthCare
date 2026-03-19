@@ -1569,7 +1569,6 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        height: MediaQuery.of(context).size.height * 0.85,
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
@@ -1580,71 +1579,75 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
           32,
           MediaQuery.of(ctx).viewInsets.bottom + 32,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF8B5CF6).withOpacity(0.1),
-                    shape: BoxShape.circle,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF8B5CF6).withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      LucideIcons.bot,
+                      color: Color(0xFF8B5CF6),
+                      size: 24,
+                    ),
                   ),
-                  child: const Icon(
-                    LucideIcons.bot,
-                    color: Color(0xFF8B5CF6),
-                    size: 24,
+                  IconButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    icon: const Icon(LucideIcons.x, color: AppTheme.textDark),
                   ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  icon: const Icon(LucideIcons.x, color: AppTheme.textDark),
-                ),
-              ],
-            ),
-            const SizedBox(height: 32),
-            Text(
-              "What did you\neat today?",
-              style: GoogleFonts.outfit(
-                color: AppTheme.textDark,
-                fontSize: 40,
-                fontWeight: FontWeight.w900,
-                height: 1.1,
-                letterSpacing: -1,
+                ],
               ),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              "Tell me naturally. I'll figure out the calories & nutrients.",
-              style: GoogleFonts.outfit(
-                color: AppTheme.textMuted,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 48),
-            Expanded(
-              child: TextField(
-                controller: controller,
-                maxLines: null,
-                autofocus: true,
+              const SizedBox(height: 32),
+              Text(
+                "What did you\neat today?",
                 style: GoogleFonts.outfit(
                   color: AppTheme.textDark,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w500,
-                ),
-                decoration: InputDecoration(
-                  hintText:
-                      "e.g. A large bowl of tonkotsu ramen with extra egg...",
-                  hintStyle: GoogleFonts.outfit(
-                    color: Colors.grey.shade300,
-                    fontSize: 24,
-                  ),
-                  border: InputBorder.none,
+                  fontSize: 40,
+                  fontWeight: FontWeight.w900,
+                  height: 1.1,
+                  letterSpacing: -1,
                 ),
               ),
-            ),
+              const SizedBox(height: 16),
+              Text(
+                "Tell me naturally. I'll figure out the calories & nutrients.",
+                style: GoogleFonts.outfit(
+                  color: AppTheme.textMuted,
+                  fontSize: 16,
+                ),
+              ),
+              const SizedBox(height: 32),
+              Container(
+                constraints: const BoxConstraints(minHeight: 120, maxHeight: 200),
+                child: TextField(
+                  controller: controller,
+                  maxLines: null,
+                  autofocus: true,
+                  style: GoogleFonts.outfit(
+                    color: AppTheme.textDark,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: InputDecoration(
+                    hintText:
+                        "e.g. A large bowl of tonkotsu ramen with extra egg...",
+                    hintStyle: GoogleFonts.outfit(
+                      color: Colors.grey.shade300,
+                      fontSize: 24,
+                    ),
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -1686,8 +1689,9 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   void _showAnalysisResult(
     BuildContext context,

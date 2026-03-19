@@ -1,81 +1,49 @@
-# MySejahtera Next Gen (MySJ) 🇲🇾✨
+# Smart HealthCare 🩺✨
 
-**MySejahtera Next Gen** is a futuristic reimagining of Malaysia's national health superapp. Built with **Flutter**, it moves beyond simple contact tracing to become a proactive, **AI-powered dedicated health companion** for every citizen.
+**Smart HealthCare** is a futuristic reimagining of a national health superapp. Built with **Flutter**, it moves beyond simple tracking to become a proactive, **AI-powered dedicated health companion** for every individual.
 
 ---
 
 ## Vision
-To create a seamless, intelligent, and human-centric health platform that anticipates needs rather than just reacting to them. MySNG combines **Generative AI**, **Hyper-local Data**, and **Gamification** to make managing health engaging and effortless.
+To create a seamless, intelligent, and human-centric health platform that anticipates needs rather than just reacting to them. Smart HealthCare combines **Generative AI**, **Hyper-local Data**, and **Gamification** to make managing health engaging and effortless.
 
 ---
 
 ## Key Features
 
 ### 1. Cortex: The AI Health Architect
-At the heart of MySNG is **Cortex**, an advanced NLU (Natural Language Understanding) driven assistant. It doesn't just answer questions; it **takes action**.
+At the heart of Smart HealthCare is **Cortex**, an advanced NLU (Natural Language Understanding) driven assistant. It doesn't just answer questions; it **takes action**.
 
 #### **Capabilities:**
 *   **One-Shot Appointment Booking**:
     *   *User:* "Book a dental appointment at Nusa Bestari for tomorrow at 2 PM."
-    *   *AI:* Instantly parses "Dental", "Nusa Bestari", and "Tomorrow 2 PM", skipping 5+ manual tap steps.
+    *   *AI:* Instantly parses "Dental", "Nusa Bestari", and "Tomorrow 2 PM", skipping manual tap steps.
 *   **Smart Medication Assistant**:
     *   *User:* "Remind me to take my Panadol every day at 9 AM."
     *   *AI:* Adds the schedule to your Medication Tracker and sets up push notifications.
-    *   *User:* "Did I take my meds today?"
-    *   *AI:* Checks your daily log and reports status.
 *   **SOS Emergency Mode**:
     *   *Trigger:* Say **"Emergency"**, **"Chest pain"**, or **"Help"**.
     *   *Action:* The interface shifts to **Red Alert Mode**.
     *   *Features:* One-tap **999 Call**, instant **Hospital Navigation** (via Google Maps), and Medical ID display.
-*   **Contextual Awareness**:
-    *   Understands "nearby" to trigger GPS.
-    *   Handles cancellations smoothly ("Actually, cancel that").
 
 ### 2. Quantum Health Dashboard
-A visually stunning, glassmorphic command center for your health data.
-*   **MySejahtera Health Score**: A proprietary algorithm that calculates a daily score (0-100) based on your BMI, sleep patterns, and step count.
-*   **Visual Calorie Tracker**: Snap a photo of your food and let the AI automatically detect the meal and estimate the calories/macros (powered by LLaMA Vision).
-*   **Gamification**:
-    *   **XP & Levels**: Earn XP for logging health data, checking in, or completing quizzes.
-    *   **Badges**: Unlock achievements like "Early Bird" (Morning check-ins) or "Marathoner" (10k steps).
+A visually stunning, modern command center for your health data.
+*   **Smart Health Score**: An algorithm that calculates a daily score based on your BMI, sleep patterns, and step count.
+*   **Visual Calorie Tracker**: Snap a photo of your food and let the AI automatically detect the meal and estimate the calories/macros.
+*   **Gamification**: Earn XP and level up for logging health data, checking in, or completing quests.
 
 ### 3. Infectious Disease Tracker (Hotspots)
 Real-time, hyper-local risk assessment.
 *   **Dynamic Heatmaps**: Visualizes active clusters of Dengue, COVID-19, and Influenza on an interactive map.
 *   **Proximity Radar**: Runs in the background (simulated) to warn you if you enter a "Red Zone".
-*   **Premise Check-In**: A fast, precise QR scanner for contact tracing.
 
 ### 4. Digital Health ID
 Your medical identity, modernized.
 *   **Vaccination Passports**: View, add, update, and manage verified vaccine certificates.
-*   **Secure Authentication**: Features enterprise-grade Email Verification with deep-linking magic (Universal App Links) to securely log users into their verified digital vault.
+*   **Secure Authentication**: Features enterprise-grade authentication with deep-linking magic to securely log users into their verified digital vault.
 
 ### 5. Secure Cloud Synchronization
 *   **Real-time Database**: Profiles, medications, and chat history are securely synchronized across devices using a real-time cloud backend.
-*   **Gamified Progress**: Your XP, levels, and daily quests are securely tracked globally.
-
----
-
-##  How to Use
-
-### **AI Chat (Cortex)**
-1.  Tap the **"Ask AI"** floating button or the bottom navigation bar.
-2.  **Type or Speak** your request.
-    *   *Try:* "I have a fever and headache." (Triage)
-    *   *Try:* "Where can I get a booster shot nearby?" (Locator)
-3.  **Booking Flow**:
-    *   The AI will ask clarifying questions if details are missing (e.g., "Which clinic?").
-    *   Confirm your details and receive a digital appointment ticket.
-
-### **Medication Tracker**
-1.  Go to **Digital Health** -> **Medication**.
-2.  Tap **+ Add Medication** or ask the AI to do it.
-3.  Mark meds as "Taken" to maintain your streak and earn Health XP.
-
-### **Hotspot Tracking**
-1.  Navigate to the **Hotspot** tab.
-2.  View your current location's risk level (Low/Medium/High).
-3.  Check the heatmap radius to safe-plan your travel.
 
 ---
 
@@ -85,17 +53,14 @@ Your medical identity, modernized.
 *   **Framework**: Flutter 3.x (Dart)
 *   **State Management**: Riverpod (for reactive, scalable state)
 *   **Backend as a Service**: Supabase (PostgreSQL, Auth, Edge Functions)
-*   **AI Engine**: Custom NLU Logic + Groq API integration (Powered by LLaMA 3 for Chat and LLaMA Vision / LLaMA 4 for Visual Calorie Tracking)
+*   **AI Engine**: Custom NLU Logic + Groq API integration (Powered by LLaMA 3 for Chat and LLaMA Vision for Visual Calorie Tracking)
 *   **Services**:
-    *   `supabase_flutter`: Secure authentication, email verification, and real-time database queries.
-    *   `app_links`: Universal mobile deep linking for seamless authentication redirects.
+    *   `supabase_flutter`: Secure authentication and database queries.
     *   `geolocator`: GPS & Location services.
     *   `flutter_map` & `latlong2`: OpenStreetMaps integration.
-    *   `shared_preferences`: Local settings storage.
-    *   `url_launcher`: External calls and navigation.
 
 ### **Design System**
-*   **Aesthetics**: Glassmorphism, Neumorphism, and Holographic UI.
+*   **Aesthetics**: Minimalist, Soft Drop-Shadows, and Modern Clean UI.
 *   **Animations**: `flutter_animate` for smooth, cinematic transitions.
 *   **Typography**: Google Fonts (Outfit / Inter) for a clean, modern look.
 
@@ -103,40 +68,16 @@ Your medical identity, modernized.
 
 ## Downloads & Installation
 
-> **Note:** This app is not yet available on the App Store or Play Store. You must install it manually.
+> **Note:** This app is not yet available on the Play Store. You must install it manually.
 
 ### **Android (APK)**
-1.  Download the **`app-release.apk`** file from this repository (or the Releases tab).
+1.  Download the **`app-release.apk`** file from this repository.
 2.  Open the file on your Android phone.
 3.  Allow "Install from Unknown Sources" if prompted.
 
-### **iOS (IPA) - Unsigned**
->  **Important:** Because Apple heavily restricts app sharing, the `ios_app.ipa` file is **unsigned** and cannot simply be sent over WhatsApp and tapped to install like an Android APK.
-
-**How to Install (Sideloading):**
-Because the app is not on the App Store, you must inject the app into your phone using a computer.
-
-**Method 1: Sideloadly (Easiest - Drag & Drop)**
-1. Download [Sideloadly](https://sideloadly.io/) on your Mac or Windows PC and install iTunes/iCloud (if on Windows).
-2. Connect your iPhone to the computer with a USB cable and tap "Trust This Computer".
-3. Open Sideloadly, drag and drop the `ios_app.ipa` file into the Sideloadly window.
-4. Enter your Apple ID email and click **Start** (it uses your Apple ID to generate a free 7-day development certificate).
-5. Enter your Apple ID password when prompted. The app will be installed on your phone.
-
-**Method 2: AltStore (Best for long-term testing)**
-1. Download [AltServer](https://altstore.io/) to your Mac/PC.
-2. Connect your iPhone and install AltStore to your phone via the AltServer menu.
-3. Open AltStore on your iPhone, go to the "My Apps" tab, click the `+` icon, and select the `ios_app.ipa` file from your phone's files to install it.
-
-**Final Step (Trusting the App)**
-Once the app appears on your iPhone's home screen, Apple will stop you from opening it until you manually trust it:
-* Go to **Settings -> General -> VPN & Device Management** on your iPhone.
-* Tap your Apple ID email under the "Developer App" section.
-* Tap **"Trust"**. You can now open MySejahtera NG!
-
 ---
 
-## Installation Guide
+## Installation Guide (For Developers)
 
 1.  **Prerequisites**:
     *   Flutter SDK installed (v3.0+)
@@ -145,8 +86,8 @@ Once the app appears on your iPhone's home screen, Apple will stop you from open
 
 2.  **Clone the Repo**:
     ```bash
-    git clone https://github.com/yourusername/my_sejahtera_ng.git
-    cd my_sejahtera_ng
+    git clone https://github.com/Shanjaay13/Smart-HealthCare.git
+    cd Smart-HealthCare
     ```
 
 3.  **Install Dependencies**:
@@ -156,12 +97,12 @@ Once the app appears on your iPhone's home screen, Apple will stop you from open
 
 4.  **Configuration (Optional)**:
     *   Create a `.env` file in the root directory.
-    *   Add your Supabase credentials to enable the live backend:
+    *   Add your Supabase and Groq API credentials:
         ```env
         SUPABASE_URL=your_project_url
         SUPABASE_ANON_KEY=your_anon_key
+        GROQ_API_KEY=your_key_here
         ```
-    *   Add `GROQ_API_KEY=your_key_here` to enable the real LLM backend.
 
 5.  **Run the App**:
     ```bash
@@ -169,10 +110,4 @@ Once the app appears on your iPhone's home screen, Apple will stop you from open
     ```
 
 ---
-
-## Roadmap
-*   [ ] integration with WearOS / Apple Watch.
-*   [ ] Blockchain-based medical record storage.
-
----
-*MySejahtera Next Gen — Empowering Malaysia, One Pulse at a Time.*
+*Smart HealthCare — Empowering your health journey, one pulse at a time.*
