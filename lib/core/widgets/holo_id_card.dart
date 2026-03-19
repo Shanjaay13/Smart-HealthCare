@@ -116,12 +116,16 @@ class _HoloIdCardState extends ConsumerState<HoloIdCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               Row(
-                 children: [
-                   const Icon(LucideIcons.heartPulse, color: Colors.white, size: 24),
-                   const SizedBox(width: 12),
-                   Text("EMERGENCY MEDICAL INFO", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1.5)),
-                 ],
+               Expanded(
+                 child: Row(
+                   children: [
+                     const Icon(LucideIcons.heartPulse, color: Colors.white, size: 24),
+                     const SizedBox(width: 12),
+                     Expanded(
+                       child: Text("EMERGENCY MEDICAL INFO", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1.5), overflow: TextOverflow.ellipsis),
+                     ),
+                   ],
+                 ),
                ),
                Row(
                  children: [

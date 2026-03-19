@@ -44,29 +44,31 @@ class NextAppointmentCard extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF00C6FF).withOpacity(0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(LucideIcons.calendarClock, color: Color(0xFF00C6FF), size: 20),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          "Upcoming Appointment",
-                          style: GoogleFonts.outfit(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF00C6FF).withOpacity(0.2),
+                            shape: BoxShape.circle,
                           ),
-                          overflow: TextOverflow.ellipsis,
+                          child: const Icon(LucideIcons.calendarClock, color: Color(0xFF00C6FF), size: 20),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            "Upcoming Appointment",
+                            style: GoogleFonts.outfit(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),

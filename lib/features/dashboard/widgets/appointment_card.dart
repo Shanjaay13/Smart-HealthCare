@@ -34,20 +34,29 @@ class AppointmentCard extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryBlue.withOpacity(0.1),
-                      shape: BoxShape.circle,
+              Expanded(
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryBlue.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(LucideIcons.calendarClock, color: AppTheme.primaryBlue, size: 16),
                     ),
-                    child: const Icon(LucideIcons.calendarClock, color: AppTheme.primaryBlue, size: 16),
-                  ),
-                  const SizedBox(width: 12),
-                  Text("UPCOMING APPOINTMENT", style: GoogleFonts.outfit(color: AppTheme.textMuted, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.5)),
-                ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        "UPCOMING APPOINTMENT", 
+                        style: GoogleFonts.outfit(color: AppTheme.textMuted, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.5),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(

@@ -50,11 +50,13 @@ class FoodEntry {
     }
     
     return FoodEntry(
-      id: map['id'],
-      name: map['name'],
-      calories: map['calories'],
+      id: map['id'] is int ? map['id'] : int.tryParse(map['id']?.toString() ?? ''),
+      name: map['name']?.toString() ?? 'Unknown',
+      calories: map['calories'] is num ? (map['calories'] as num).toInt() : int.tryParse(map['calories']?.toString() ?? '0') ?? 0,
       type: dType,
-      createdAt: map['created_at'] != null ? DateTime.parse(map['created_at']) : null,
+      createdAt: map['created_at'] != null 
+          ? DateTime.tryParse(map['created_at'].toString()) 
+          : (map['createdAt'] != null ? DateTime.tryParse(map['createdAt'].toString()) : null),
     );
   }
 }
@@ -188,11 +190,11 @@ class FoodTrackerNotifier extends StateNotifier<FoodTrackerState> {
       final sevenDaysAgo = today.subtract(const Duration(days: 6)); 
 
       // Fetch recent logs directly without PostgREST date formatting to guarantee no timezone mismatches
+      // We also do NOT use .order('created_at') here to prevent silent crashes if the column name doesn't match EXACTLY.
       final response = await _supabase
           .from('food_logs')
           .select()
           .eq('user_id', user.id)
-          .order('created_at', ascending: false)
           .limit(200);
 
       final logs = (response as List).map((e) => FoodEntry.fromMap(e)).toList();

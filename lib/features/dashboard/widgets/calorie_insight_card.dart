@@ -85,14 +85,17 @@ class CalorieInsightCard extends ConsumerWidget {
                  
                  // Right Glowing Thick Ring
                  SizedBox(
-                   width: 85, height: 85,
+                   width: 95, height: 95,
                    child: Stack(
                      fit: StackFit.expand,
                      children: [
-                        CircularProgressIndicator(
-                          value: 1.0,
-                          color: AppTheme.bgLight,
-                          strokeWidth: 10,
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: CircularProgressIndicator(
+                            value: 1.0,
+                            color: AppTheme.bgLight,
+                            strokeWidth: 12,
+                          ),
                         ),
                         ShaderMask(
                           shaderCallback: (rect) => LinearGradient(
@@ -100,11 +103,14 @@ class CalorieInsightCard extends ConsumerWidget {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ).createShader(rect),
-                          child: CircularProgressIndicator(
-                            value: progress,
-                            color: Colors.white,
-                            strokeWidth: 10,
-                            strokeCap: StrokeCap.round,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: CircularProgressIndicator(
+                              value: progress,
+                              color: Colors.white,
+                              strokeWidth: 12,
+                              strokeCap: StrokeCap.round,
+                            ),
                           ),
                         ),
                         Center(

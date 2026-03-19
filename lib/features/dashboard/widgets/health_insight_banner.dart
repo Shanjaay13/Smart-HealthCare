@@ -18,7 +18,6 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 280,
       decoration: BoxDecoration(
         color: const Color(0xFF0F172A), // Deep Slate Dark Mode
         borderRadius: BorderRadius.circular(64), // Extremely Round Shape
@@ -72,9 +71,14 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
               const SizedBox(height: 24),
               
               // Chart
-              Expanded(
+              SizedBox(
+                height: 120, // Reduced height to stop vertical stretch
                 child: LineChart(
                   LineChartData(
+                    minY: 0, // Gives floor padding so line doesn't hit text
+                    maxY: 8, // Gives ceiling padding
+                    minX: -0.2, // Gives left breathing room
+                    maxX: 6.2, // Gives right breathing room
                     gridData: const FlGridData(show: false),
                     titlesData: FlTitlesData(
                       show: true,
@@ -87,6 +91,10 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
                           interval: 1,
                           reservedSize: 22,
                           getTitlesWidget: (value, meta) {
+                            if (value < 0 || value > 6 || value % 1 != 0) {
+                              return const SizedBox.shrink();
+                            }
+
                             const style = TextStyle(
                               color: Colors.white54,
                               fontWeight: FontWeight.bold,
@@ -101,7 +109,7 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
                               case 4: text = 'F'; break;
                               case 5: text = 'S'; break;
                               case 6: text = 'S'; break;
-                              default: return Container();
+                              default: return const SizedBox.shrink();
                             }
                             return Text(text, style: style);
                           },
@@ -183,14 +191,14 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
               const SizedBox(height: 24),
 
               // Stats Row
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                alignment: WrapAlignment.center,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildStatItem(LucideIcons.moon, "7h 30m", "Sleep", const Color(0xFF8B5CF6)),
-                  _buildStatItem(LucideIcons.footprints, "8,432", "Steps", const Color(0xFFF59E0B)),
-                  _buildStatItem(LucideIcons.activity, "72 bpm", "Vitals", const Color(0xFFEF4444)),
+                  Expanded(child: _buildStatItem(LucideIcons.moon, "7h 30m", "Sleep", const Color(0xFF8B5CF6))),
+                  const SizedBox(width: 8),
+                  Expanded(child: _buildStatItem(LucideIcons.footprints, "8,432", "Steps", const Color(0xFFF59E0B))),
+                  const SizedBox(width: 8),
+                  Expanded(child: _buildStatItem(LucideIcons.activity, "72 bpm", "Vitals", const Color(0xFFEF4444))),
                 ],
               ),
             ],
@@ -291,13 +299,13 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
 
   Widget _buildStatItem(IconData icon, String value, String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
-      child: Row(
+      child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
@@ -305,14 +313,9 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
             decoration: BoxDecoration(color: color.withOpacity(0.15), shape: BoxShape.circle),
             child: Icon(icon, color: color, size: 14),
           ),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-              Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.w600)),
-            ],
-          ),
+          const SizedBox(height: 8),
+          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
         ],
       ),
     );

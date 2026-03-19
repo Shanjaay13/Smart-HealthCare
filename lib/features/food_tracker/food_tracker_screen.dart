@@ -202,29 +202,35 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
         children: [
           Center(
             child: SizedBox(
-              width: 200,
-              height: 200,
+              width: 220,
+              height: 220,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  const CircularProgressIndicator(
-                    value: 1.0,
-                    color: AppTheme.bgLight,
-                    strokeWidth: 18,
+                  const Padding(
+                    padding: EdgeInsets.all(12.0),
+                    child: CircularProgressIndicator(
+                      value: 1.0,
+                      color: AppTheme.bgLight,
+                      strokeWidth: 18,
+                    ),
                   ),
                   ShaderMask(
                     shaderCallback: (rect) => const SweepGradient(
-                      startAngle: -pi / 2,
-                      endAngle: 3 * pi / 2,
+                      startAngle: -1.5707963268, // -pi/2
+                      endAngle: 4.7123889804, // 3*pi/2
                       colors: [Color(0xFF8B5CF6), Color(0xFF0EA5E9), Color(0xFF10B981)],
                       stops: [0.0, 0.5, 1.0],
                     ).createShader(rect),
-                    child: CircularProgressIndicator(
-                      value: progress,
-                      backgroundColor: Colors.transparent,
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                      strokeWidth: 18,
-                      strokeCap: StrokeCap.round,
+                    child: Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: CircularProgressIndicator(
+                        value: progress,
+                        backgroundColor: Colors.transparent,
+                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                        strokeWidth: 18,
+                        strokeCap: StrokeCap.round,
+                      ),
                     ),
                   ),
                   Column(

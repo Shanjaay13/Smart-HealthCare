@@ -42,15 +42,18 @@ class QuestBoard extends ConsumerWidget {
             ),
             // Beautiful XP Ring
             SizedBox(
-              width: 64,
-              height: 64,
+              width: 72,
+              height: 72,
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  const CircularProgressIndicator(
-                    value: 1.0,
-                    color: Colors.white, 
-                    strokeWidth: 8,
+                  const Padding(
+                    padding: EdgeInsets.all(4.0),
+                    child: CircularProgressIndicator(
+                      value: 1.0,
+                      color: Colors.white, 
+                      strokeWidth: 8,
+                    ),
                   ),
                   ShaderMask(
                      shaderCallback: (rect) => const LinearGradient(
@@ -58,11 +61,14 @@ class QuestBoard extends ConsumerWidget {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                      ).createShader(rect),
-                     child: CircularProgressIndicator(
-                        value: progress.xp,
-                        color: Colors.white,
-                        strokeWidth: 8,
-                        strokeCap: StrokeCap.round,
+                     child: Padding(
+                       padding: const EdgeInsets.all(4.0),
+                       child: CircularProgressIndicator(
+                          value: progress.xp,
+                          color: Colors.white,
+                          strokeWidth: 8,
+                          strokeCap: StrokeCap.round,
+                       ),
                      )
                   ),
                   Center(

@@ -15,7 +15,7 @@ class NotificationService {
   Future<void> init() async {
     tzd.initializeTimeZones();
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('ic_notification');
     
     // Note: Request permissions for iOS separately in main.dart or here
     const DarwinInitializationSettings initializationSettingsDarwin =

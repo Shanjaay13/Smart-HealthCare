@@ -42,7 +42,7 @@ class _HotspotScreenState extends State<HotspotScreen> {
 
   Future<void> _initializeNotifications() async {
     tz.initializeTimeZones();
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings('ic_notification');
     const iosSettings = DarwinInitializationSettings();
     const settings = InitializationSettings(android: androidSettings, iOS: iosSettings);
     await _notificationsPlugin.initialize(settings);
@@ -365,7 +365,10 @@ class _HotspotScreenState extends State<HotspotScreen> {
                             decoration: InputDecoration(
                                 hintText: "Search location...",
                                 hintStyle: const TextStyle(color: Colors.white54),
+                                filled: false,
                                 border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
                                 icon: const Icon(LucideIcons.search, color: Colors.white54),
                                 suffixIcon: IconButton(
                                   icon: const Icon(LucideIcons.arrowRight, color: Colors.blueAccent),

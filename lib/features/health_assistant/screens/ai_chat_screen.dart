@@ -832,9 +832,6 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
          if (slots == 0) slots = availableSlots.length;
 
          response = "Checking availability at $userText... 🏥";
-         
-         ref.read(chatProvider.notifier).addMessage(ChatMessage(text: response, isUser: false));
-         _scrollToBottom();
 
          Future.delayed(const Duration(milliseconds: 1000), () {
             if (!mounted) return;
