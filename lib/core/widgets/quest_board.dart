@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
 import 'package:my_sejahtera_ng/features/gamification/providers/quest_provider.dart';
 import 'package:my_sejahtera_ng/features/gamification/providers/user_progress_provider.dart';
@@ -20,103 +21,131 @@ class QuestBoard extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Header
+        // Premium Header
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Daily Goals", style: Theme.of(context).textTheme.displayMedium?.copyWith(
-              fontSize: 20
-            )),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF59E0B).withOpacity(0.15), 
-                borderRadius: BorderRadius.circular(20),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                   "Daily Goals", 
+                   style: GoogleFonts.outfit(color: AppTheme.textDark, fontSize: 36, fontWeight: FontWeight.w900, letterSpacing: -1, height: 1.1)
+                ),
+                const SizedBox(height: 4),
+                Text(
+                   "${(progress.xp * 1000).toInt()} / 1000 XP to Level ${progress.level + 1}", 
+                   style: GoogleFonts.outfit(color: AppTheme.textMuted, fontSize: 16, fontWeight: FontWeight.w600)
+                ),
+              ],
+            ),
+            // Beautiful XP Ring
+            SizedBox(
+              width: 64,
+              height: 64,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  const CircularProgressIndicator(
+                    value: 1.0,
+                    color: Colors.white, 
+                    strokeWidth: 8,
+                  ),
+                  ShaderMask(
+                     shaderCallback: (rect) => const LinearGradient(
+                        colors: [Color(0xFFF59E0B), Color(0xFFFCD34D)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                     ).createShader(rect),
+                     child: CircularProgressIndicator(
+                        value: progress.xp,
+                        color: Colors.white,
+                        strokeWidth: 8,
+                        strokeCap: StrokeCap.round,
+                     )
+                  ),
+                  Center(
+                    child: Text(
+                      "${progress.level}", 
+                      style: GoogleFonts.outfit(color: const Color(0xFFD97706), fontSize: 22, fontWeight: FontWeight.w900)
+                    )
+                  )
+                ],
               ),
-              child: Text("LVL ${progress.level}", style: const TextStyle(color: Color(0xFFD97706), fontWeight: FontWeight.bold)),
             )
           ],
         ),
-        const SizedBox(height: 16),
-        
-        // XP Bar
-        Container(
-          height: 12, 
-          width: double.infinity,
-          decoration: BoxDecoration(color: AppTheme.bgLight, borderRadius: BorderRadius.circular(6)),
-          child: FractionallySizedBox(
-            alignment: Alignment.centerLeft,
-            widthFactor: progress.xp,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                color: const Color(0xFFF59E0B),
-              ),
-            ),
-          ).animate(target: progress.xp == 1 ? 1 : 0).shimmer(duration: 1.seconds),
-        ),
-        const SizedBox(height: 8),
-        Text("${(progress.xp * 1000).toInt()} / 1000 XP", style: const TextStyle(color: AppTheme.textMuted, fontSize: 13, fontWeight: FontWeight.w600)),
         
         const SizedBox(height: 24),
         
         // Quests List
         ...quests.map((quest) {
-           return Padding(
-             padding: const EdgeInsets.only(bottom: 16),
-             child: Container(
-               decoration: BoxDecoration(
-                 color: AppTheme.surfaceWhite,
-                 borderRadius: BorderRadius.circular(40),
-                 boxShadow: [
-                   BoxShadow(
-                     color: const Color(0xFF6366F1).withOpacity(0.1),
-                     blurRadius: 20,
-                     offset: const Offset(0, 8),
-                   )
-                 ]
-               ),
-               padding: const EdgeInsets.all(16),
-               child: Row(
-                 children: [
-                   Container(
-                     padding: const EdgeInsets.all(12),
-                     decoration: BoxDecoration(
-                       color: quest.status == QuestStatus.claimed ? AppTheme.success.withOpacity(0.1) : AppTheme.bgLight,
-                       shape: BoxShape.circle
-                     ),
-                     child: Icon(
-                        quest.status == QuestStatus.claimed ? LucideIcons.check : quest.icon, 
-                        color: quest.status == QuestStatus.claimed ? AppTheme.success : AppTheme.textDark, 
-                        size: 24
-                     ),
+           final isClaimed = quest.status == QuestStatus.claimed;
+           final isCompleted = quest.status == QuestStatus.completed;
+           
+           return Container(
+             margin: const EdgeInsets.only(bottom: 16),
+             padding: const EdgeInsets.all(24),
+             decoration: BoxDecoration(
+               color: isClaimed ? Colors.transparent : Colors.white,
+               borderRadius: BorderRadius.circular(32),
+               border: isClaimed ? Border.all(color: Colors.grey.shade300, width: 2) : null,
+               boxShadow: isClaimed ? [] : [
+                 BoxShadow(
+                   color: Colors.black.withOpacity(0.04),
+                   blurRadius: 24,
+                   offset: const Offset(0, 10),
+                 )
+               ]
+             ),
+             child: Row(
+               children: [
+                 // Striking Icon
+                 Container(
+                   padding: const EdgeInsets.all(16),
+                   decoration: BoxDecoration(
+                     color: isClaimed ? AppTheme.bgLight : (isCompleted ? const Color(0xFFF59E0B).withOpacity(0.15) : AppTheme.primaryBlue.withOpacity(0.1)),
+                     shape: BoxShape.circle,
                    ),
-                   const SizedBox(width: 16),
-                   Expanded(
-                     child: Column(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                       children: [
-                         Text(
-                           quest.title, 
-                           style: TextStyle(
-                             color: quest.status == QuestStatus.claimed ? AppTheme.textMuted : AppTheme.textDark,
-                             decoration: quest.status == QuestStatus.claimed ? TextDecoration.lineThrough : null,
-                             fontWeight: FontWeight.w600,
-                             fontSize: 15
-                           )
-                         ),
-                         const SizedBox(height: 4),
-                         Text(
-                            "+${quest.xp} XP", 
-                            style: const TextStyle(color: Color(0xFFD97706), fontSize: 13, fontWeight: FontWeight.bold)
-                         ),
-                       ],
-                     ),
+                   child: Icon(
+                      isClaimed ? LucideIcons.checkCheck : quest.icon, 
+                      color: isClaimed ? AppTheme.textMuted : (isCompleted ? const Color(0xFFD97706) : AppTheme.primaryBlue), 
+                      size: 24
                    ),
-                   
-                   _buildActionButton(context, ref, quest),
-                 ],
-               ),
+                 ),
+                 const SizedBox(width: 16),
+                 Expanded(
+                   child: Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                       Text(
+                         quest.title, 
+                         style: GoogleFonts.outfit(
+                           color: isClaimed ? AppTheme.textMuted : AppTheme.textDark,
+                           decoration: isClaimed ? TextDecoration.lineThrough : null,
+                           fontWeight: FontWeight.bold,
+                           fontSize: 16
+                         )
+                       ),
+                       const SizedBox(height: 4),
+                       Row(
+                          children: [
+                             Icon(LucideIcons.zap, size: 14, color: isClaimed ? AppTheme.textMuted : const Color(0xFFF59E0B)),
+                             const SizedBox(width: 4),
+                             Text(
+                                "+${quest.xp} XP", 
+                                style: GoogleFonts.outfit(color: isClaimed ? AppTheme.textMuted : const Color(0xFFD97706), fontSize: 14, fontWeight: FontWeight.w800)
+                             ),
+                          ]
+                       )
+                     ],
+                   ),
+                 ),
+                 
+                 const SizedBox(width: 12),
+                 _buildActionButton(context, ref, quest),
+               ],
              ),
            );
         })
@@ -127,7 +156,7 @@ class QuestBoard extends ConsumerWidget {
   Widget _buildActionButton(BuildContext context, WidgetRef ref, Quest quest) {
     switch (quest.status) {
       case QuestStatus.claimed:
-        return const SizedBox.shrink(); // Hide button if claimed
+        return const SizedBox.shrink();
         
       case QuestStatus.completed:
         return ElevatedButton(
@@ -137,10 +166,12 @@ class QuestBoard extends ConsumerWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFF59E0B),
             foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10)
+            elevation: 8,
+            shadowColor: const Color(0xFFF59E0B).withOpacity(0.5),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14)
           ),
-          child: const Text("Claim"),
+          child: Text("CLAIM", style: GoogleFonts.outfit(fontWeight: FontWeight.w900, fontSize: 13, letterSpacing: 1)),
         ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(duration: 800.ms, begin: const Offset(1,1), end: const Offset(1.05, 1.05));
         
       case QuestStatus.pending:
@@ -153,22 +184,24 @@ class QuestBoard extends ConsumerWidget {
                backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
                foregroundColor: AppTheme.primaryBlue,
                elevation: 0,
-               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14)
              ),
-             child: const Text("GO", style: TextStyle(fontWeight: FontWeight.bold)),
+             child: Text("GO", style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14)),
            );
         } else {
-          return ElevatedButton(
+           return ElevatedButton(
              onPressed: () {
                 ref.read(questProvider.notifier).markManualComplete(quest.id);
              },
              style: ElevatedButton.styleFrom(
-               backgroundColor: AppTheme.bgLight,
+               backgroundColor: Colors.grey.shade100,
                foregroundColor: AppTheme.textMuted,
                elevation: 0,
-               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14)
              ),
-             child: const Text("Done"),
+             child: Text("DONE", style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13)),
            );
         }
     }

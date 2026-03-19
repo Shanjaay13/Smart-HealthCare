@@ -40,7 +40,7 @@ class DashboardScreen extends ConsumerWidget {
               flexibleSpace: FlexibleSpaceBar(
                 titlePadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 title: Text(
-                  "Summary",
+                  "Dashboard",
                   style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 28),
                 ),
               ),
@@ -101,8 +101,7 @@ class DashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildSectionTitle(context, "Medical Profile").animate().fadeIn(delay: 100.ms).slideX(begin: -0.1, end: 0),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         const HoloIdCard().animate().fadeIn(delay: 200.ms).slideY(begin: 0.1, end: 0, duration: 800.ms, curve: Curves.easeOutCubic).scale(begin: const Offset(0.9, 0.9), delay: 200.ms),
         
         const SizedBox(height: 32),
@@ -139,8 +138,7 @@ class DashboardScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  _buildSectionTitle(context, "Medical Profile").animate().fadeIn(delay: 100.ms).slideX(begin: -0.1, end: 0),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   const HoloIdCard().animate().fadeIn(delay: 200.ms).slideY(begin: 0.1, end: 0, duration: 1000.ms, curve: Curves.easeOutCubic).scale(begin: const Offset(0.9, 0.9)),
                   
                   const SizedBox(height: 32),

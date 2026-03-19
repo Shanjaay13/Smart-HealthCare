@@ -20,30 +20,20 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
       width: double.infinity,
       height: 280,
       decoration: BoxDecoration(
-        color: const Color(0xFFF0FDF4),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(50),
-          bottomLeft: Radius.circular(50),
-          bottomRight: Radius.circular(20),
-        ),
+        color: const Color(0xFF0F172A), // Deep Slate Dark Mode
+        borderRadius: BorderRadius.circular(64), // Extremely Round Shape
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF10B981).withOpacity(0.15),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
+            color: const Color(0xFF0F172A).withOpacity(0.2),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(50),
-          bottomLeft: Radius.circular(50),
-          bottomRight: Radius.circular(20),
-        ),
+        borderRadius: BorderRadius.circular(64),
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -51,38 +41,32 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Weekly Score",
-                        style: GoogleFonts.outfit(
-                          color: AppTheme.textDark,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        "You're doing great!",
-                        style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
-                      ),
-                    ],
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppTheme.success.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(LucideIcons.trendingUp, color: AppTheme.success, size: 16),
-                        const SizedBox(width: 4),
-                        const Text("+12%", style: TextStyle(color: AppTheme.success, fontSize: 13, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ),
+                   Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                       Text(
+                         "Weekly Score",
+                         style: GoogleFonts.outfit(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                       ),
+                       const SizedBox(height: 2),
+                       const Text("You're doing great!", style: TextStyle(color: Colors.white70, fontSize: 13)),
+                     ],
+                   ),
+                   Container(
+                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                     decoration: BoxDecoration(
+                       color: Colors.cyanAccent.withOpacity(0.15),
+                       borderRadius: BorderRadius.circular(20),
+                       border: Border.all(color: Colors.cyanAccent.withOpacity(0.3)),
+                     ),
+                     child: const Row(
+                       children: [
+                         Icon(LucideIcons.trendingUp, color: Colors.cyanAccent, size: 16),
+                         SizedBox(width: 6),
+                         Text("+12%", style: TextStyle(color: Colors.cyanAccent, fontSize: 13, fontWeight: FontWeight.bold)),
+                       ],
+                     ),
+                   ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -104,7 +88,7 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
                           reservedSize: 22,
                           getTitlesWidget: (value, meta) {
                             const style = TextStyle(
-                              color: AppTheme.textMuted,
+                              color: Colors.white54,
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
                             );
@@ -174,17 +158,18 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
                           FlSpot(6, 6.5)
                         ],
                         isCurved: true,
-                        color: AppTheme.primaryBlue,
-                        barWidth: 4,
+                        color: Colors.cyanAccent,
+                        barWidth: 6,
                         isStrokeCapRound: true,
                         dotData: const FlDotData(show: false),
+                        shadow: const Shadow(color: Colors.cyanAccent, blurRadius: 10, offset: Offset(0, 4)),
                         belowBarData: BarAreaData(
                           show: true,
-                          color: AppTheme.primaryBlue.withOpacity(0.2),
+                          color: Colors.cyanAccent.withOpacity(0.1),
                           gradient: LinearGradient(
                             colors: [
-                              AppTheme.primaryBlue.withOpacity(0.3),
-                              AppTheme.primaryBlue.withOpacity(0.0),
+                              Colors.cyanAccent.withOpacity(0.4),
+                              Colors.cyanAccent.withOpacity(0.0),
                             ],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
@@ -198,8 +183,10 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
               const SizedBox(height: 24),
 
               // Stats Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
                 children: [
                   _buildStatItem(LucideIcons.moon, "7h 30m", "Sleep", const Color(0xFF8B5CF6)),
                   _buildStatItem(LucideIcons.footprints, "8,432", "Steps", const Color(0xFFF59E0B)),
@@ -229,29 +216,29 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
         decoration: const BoxDecoration(
-          color: AppTheme.surfaceWhite,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+          color: Color(0xFF1E293B), // Seamless integration with parent aesthetic
+          borderRadius: BorderRadius.vertical(top: Radius.circular(36)),
         ),
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             Center(child: Container(width: 48, height: 6, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(3)))),
+             Center(child: Container(width: 48, height: 6, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(3)))),
              const SizedBox(height: 32),
              Row(
                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                children: [
-                 Text(dayName, style: GoogleFonts.outfit(color: AppTheme.textDark, fontSize: 28, fontWeight: FontWeight.bold)),
+                 Text(dayName, style: GoogleFonts.outfit(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
                  Container(
                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                   decoration: BoxDecoration(color: AppTheme.primaryBlue.withOpacity(0.1), borderRadius: BorderRadius.circular(24)),
-                   child: Text("Score: $score", style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 16)),
+                   decoration: BoxDecoration(color: Colors.cyanAccent.withOpacity(0.1), borderRadius: BorderRadius.circular(24)),
+                   child: Text("Score: $score", style: const TextStyle(color: Colors.cyanAccent, fontWeight: FontWeight.bold, fontSize: 16)),
                  )
                ],
              ),
              const SizedBox(height: 12),
-             Text(guidance, style: const TextStyle(color: AppTheme.textMuted, fontSize: 16)),
+             Text(guidance, style: const TextStyle(color: Colors.white70, fontSize: 16)),
              const SizedBox(height: 32),
              Row(
                mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -273,17 +260,17 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
       width: 100,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.1)),
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: color.withOpacity(0.2)),
       ),
       child: Column(
         children: [
           Icon(icon, color: color, size: 28),
           const SizedBox(height: 12),
-          Text(value, style: const TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 18)),
-          const SizedBox(height: 2),
-          Text(label, style: const TextStyle(color: AppTheme.textMuted, fontSize: 12, fontWeight: FontWeight.w600)),
+          Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 4),
+          Text(label, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 0.5)),
         ],
       ),
     );
@@ -304,22 +291,28 @@ class _HealthInsightBannerState extends ConsumerState<HealthInsightBanner> {
 
   Widget _buildStatItem(IconData icon, String value, String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: AppTheme.bgLight,
+        color: Colors.white.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
       ),
-      child: Column(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(color: color.withOpacity(0.15), shape: BoxShape.circle),
+            child: Icon(icon, color: color, size: 14),
+          ),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, color: color, size: 16),
-              const SizedBox(width: 8),
-              Text(value, style: const TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 14)),
+              Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+              Text(label, style: const TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.w600)),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: AppTheme.textMuted, fontSize: 12, fontWeight: FontWeight.w500)),
         ],
       ),
     );

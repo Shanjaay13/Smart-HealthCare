@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
 import 'package:my_sejahtera_ng/core/widgets/bouncing_button.dart';
 import 'package:my_sejahtera_ng/features/food_tracker/providers/food_tracker_provider.dart';
@@ -17,148 +18,131 @@ class CalorieInsightCard extends ConsumerWidget {
     final remaining = state.calorieTarget - state.totalCalories;
     final isOver = remaining < 0;
     
-    final accentColor = isOver ? AppTheme.error : AppTheme.primaryBlue;
+    final gradientColors = isOver 
+        ? const [Color(0xFFEF4444), Color(0xFF991B1B)] // Warning Red Gradient
+        : const [Color(0xFFF59E0B), Color(0xFFEC4899)]; // Vibrant Orange-Pink Gradient
 
     return BouncingButton(
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => FoodTrackerScreen()),
+          MaterialPageRoute(builder: (context) => const FoodTrackerScreen()),
         );
       },
       child: Container(
+        width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFFFEF3C7),
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(50),
-            topRight: Radius.circular(20),
-            bottomLeft: Radius.circular(20),
-            bottomRight: Radius.circular(50),
-          ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(36),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFFF59E0B).withOpacity(0.15),
-              blurRadius: 24,
-              offset: const Offset(0, 8),
+              color: gradientColors[0].withOpacity(0.12),
+              blurRadius: 30,
+              offset: const Offset(0, 15),
             )
           ]
         ),
-        padding: const EdgeInsets.all(24),
-        child: Row(
+        padding: const EdgeInsets.all(28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Circular Progress
-            SizedBox(
-              height: 70,
-              width: 70,
-              child: Stack(
-                children: [
-                  Center(
-                    child: SizedBox(
-                      height: 70,
-                      width: 70,
-                      child: CircularProgressIndicator(
-                        value: progress,
-                        backgroundColor: AppTheme.bgLight,
-                        color: accentColor,
-                        strokeWidth: 8,
-                        strokeCap: StrokeCap.round,
-                      ),
-                    ),
-                  ),
-                  Center(
-                    child: Icon(
-                      LucideIcons.flame,
-                      color: accentColor,
-                      size: 28,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 24),
-            
-            // Text Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Calorie Intake",
-                    style: TextStyle(
-                      color: AppTheme.textMuted,
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
+            // Header
+            Row(
+               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+               children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
                     children: [
-                      Text(
-                        "${state.totalCalories}",
-                        style: const TextStyle(
-                          color: AppTheme.textDark,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      Text(
-                        " / ${state.calorieTarget} kcal",
-                        style: const TextStyle(
-                          color: AppTheme.textMuted,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                       Icon(LucideIcons.flame, color: gradientColors[0], size: 20),
+                       const SizedBox(width: 8),
+                       Text("CALORIE INTAKE", style: GoogleFonts.outfit(color: AppTheme.textMuted, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  
-                  // AI Insight Pill
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: accentColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                  const Icon(LucideIcons.chevronRight, color: AppTheme.textMuted, size: 20),
+               ]
+            ),
+            const SizedBox(height: 24),
+            
+            // Main Content
+            Row(
+               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+               children: [
+                 // Left Typography
+                 Expanded(
+                   child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          LucideIcons.sparkles,
-                          size: 12,
-                          color: accentColor,
+                         Text(
+                           "${state.totalCalories}", 
+                           style: GoogleFonts.outfit(color: AppTheme.textDark, fontSize: 48, fontWeight: FontWeight.w900, height: 1.1, letterSpacing: -1),
+                         ),
+                         Text(
+                           "/ ${state.calorieTarget} kcal", 
+                           style: GoogleFonts.outfit(color: AppTheme.textMuted, fontSize: 18, fontWeight: FontWeight.w600),
+                         ),
+                      ]
+                   ),
+                 ),
+                 
+                 // Right Glowing Thick Ring
+                 SizedBox(
+                   width: 85, height: 85,
+                   child: Stack(
+                     fit: StackFit.expand,
+                     children: [
+                        CircularProgressIndicator(
+                          value: 1.0,
+                          color: AppTheme.bgLight,
+                          strokeWidth: 10,
                         ),
-                        const SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            state.currentInsight,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              color: accentColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        ShaderMask(
+                          shaderCallback: (rect) => LinearGradient(
+                            colors: gradientColors,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ).createShader(rect),
+                          child: CircularProgressIndicator(
+                            value: progress,
+                            color: Colors.white,
+                            strokeWidth: 10,
+                            strokeCap: StrokeCap.round,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                        Center(
+                          child: Text(
+                             "${(progress * 100).toInt()}%",
+                             style: GoogleFonts.outfit(color: AppTheme.textDark, fontWeight: FontWeight.w800, fontSize: 18),
+                          )
+                        ),
+                     ]
+                   )
+                 )
+               ]
             ),
             
-            // Chevron
-            const Icon(
-              LucideIcons.chevronRight,
-              color: AppTheme.textMuted,
-              size: 24,
-            ),
+            // AI Insight
+            if (state.currentInsight.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(top: 28),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                decoration: BoxDecoration(
+                   color: gradientColors[0].withOpacity(0.08),
+                   borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                   children: [
+                      Icon(LucideIcons.sparkles, color: gradientColors[0], size: 18),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                           state.currentInsight,
+                           style: GoogleFonts.outfit(color: gradientColors[0].withOpacity(0.8), fontWeight: FontWeight.bold, fontSize: 13),
+                        )
+                      )
+                   ]
+                )
+              )
           ],
-        ),
+        )
       ),
     );
   }

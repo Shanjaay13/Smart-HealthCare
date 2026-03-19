@@ -27,203 +27,160 @@ class _HoloIdCardState extends ConsumerState<HoloIdCard> {
 
     return GestureDetector(
       onTap: () => setState(() => _showMedicalInfo = !_showMedicalInfo),
-      child: Container(
-        height: 235,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 650),
+        curve: Curves.elasticOut,
+        height: _showMedicalInfo ? 260 : 96,
         width: double.infinity,
         decoration: BoxDecoration(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(40),
-            topRight: Radius.circular(16),
-            bottomLeft: Radius.circular(16),
-            bottomRight: Radius.circular(40),
-          ),
-          gradient: const LinearGradient(
+          borderRadius: BorderRadius.circular(_showMedicalInfo ? 36 : 100),
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF60A5FA), Color(0xFF2563EB)], // Softer Blue Gradient
+            colors: _showMedicalInfo
+                ? const [Color(0xFFEF4444), Color(0xFF991B1B)] // Emergency Red
+                : const [Color(0xFF0F172A), Color(0xFF1E293B)], // Sleek Slate
           ),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primaryBlue.withOpacity(0.2),
-              blurRadius: 30,
-              offset: const Offset(0, 15),
+              color: (_showMedicalInfo ? const Color(0xFFEF4444) : const Color(0xFF0F172A)).withOpacity(0.3),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
             )
           ],
         ),
-        child: Stack(
-          children: [
-            // Decorative background curves
-            Positioned(
-              right: -50,
-              top: -50,
-              child: Opacity(
-                opacity: 0.1,
-                child: Container(
-                  width: 200, height: 200,
-                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-                ),
-              ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(_showMedicalInfo ? 36 : 100),
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              switchInCurve: Curves.easeOut,
+              switchOutCurve: Curves.easeIn,
+              transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: child),
+              child: _showMedicalInfo 
+                  ? _buildExpandedMedical(user, isOwner) 
+                  : _buildCompactIdentity(user, progress, isOwner),
             ),
-            Positioned(
-              left: -30,
-              bottom: -30,
-              child: Opacity(
-                opacity: 0.1,
-                child: Container(
-                  width: 140, height: 140,
-                  decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
-                ),
-              ),
-            ),
-            
-            // Content
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: AnimatedSwitcher(
-                duration: 400.ms,
-                transitionBuilder: (child, anim) => FadeTransition(opacity: anim, child: SlideTransition(position: Tween<Offset>(begin: const Offset(0, 0.1), end: Offset.zero).animate(anim), child: child)),
-                child: _showMedicalInfo 
-                    ? _buildMedicalInfo(user, isOwner) 
-                    : _buildIdentityInfo(user, progress, isOwner),
-              ),
-            ),
-
-            // Edit Button
-            if (isOwner)
-              Positioned(
-                top: 16,
-                right: 16,
-                child: IconButton(
-                  icon: Icon(LucideIcons.pencil, color: Colors.white.withOpacity(0.7), size: 18),
-                  onPressed: _showEditDialog,
-                ),
-              ),
-              
-            // Mode Indicator
-            Positioned(
-              bottom: 16,
-              right: 16,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(12)),
-                child: Text(_showMedicalInfo ? "MEDICAL" : "IDENTITY", style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-              ),
-            )
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildIdentityInfo(UserSession? user, UserProgress progress, bool isOwner) {
-    return Column(
-      key: const ValueKey('identity'),
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Icon(LucideIcons.shieldCheck, color: Colors.white, size: 20),
-            const SizedBox(width: 8),
-            Text("SMART HEALTH ID", style: GoogleFonts.outfit(color: Colors.white, fontSize: 14, letterSpacing: 2, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        const Spacer(),
-        Row(
-          children: [
-            Container(
-              width: 70, height: 70,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-              ),
-              child: const Icon(LucideIcons.user, color: Colors.white, size: 32),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    user?.fullName.toUpperCase() ?? "GUEST USER", 
-                    style: GoogleFonts.outfit(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                  Text("IC: ${user?.icNumber ?? '----------------'}", style: GoogleFonts.shareTechMono(color: Colors.white.withOpacity(0.8), fontSize: 13)),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 8,
-                    runSpacing: 4,
-                    children: [
-                      _buildBadge("LVL ${progress.level}"),
-                      _buildBadge("FULLY VACCINATED"),
-                    ],
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-      ],
-    );
-  }
-
-  Widget _buildMedicalInfo(UserSession? user, bool isOwner) {
-    return Column(
-      key: const ValueKey('medical'),
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Icon(LucideIcons.cross, color: Colors.redAccent, size: 20),
-            const SizedBox(width: 8),
-            Text("EMERGENCY INFO", style: GoogleFonts.outfit(color: Colors.redAccent, fontSize: 14, letterSpacing: 2, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(child: _buildMedicalField("BLOOD TYPE", user?.bloodType ?? "Unknown", Colors.white)),
-            const SizedBox(width: 16),
-            Expanded(child: _buildMedicalField("ALLERGIES", user?.allergies ?? "None", Colors.white)),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(child: _buildMedicalField("CONDITION", user?.medicalCondition ?? "None", Colors.white)),
-            const SizedBox(width: 16),
-            Expanded(child: _buildMedicalField("CONTACT", user?.emergencyContact ?? "Not Set", Colors.white)),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildMedicalField(String label, String value, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
-        const SizedBox(height: 2),
-        Text(value, style: TextStyle(color: color, fontSize: 14, fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
-      ],
-    );
-  }
-
-  Widget _buildBadge(String text) {
+  Widget _buildCompactIdentity(UserSession? user, UserProgress progress, bool isOwner) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      key: const ValueKey('compact'),
+      height: 96,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            width: 64, height: 64,
+            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white12),
+            child: const Icon(LucideIcons.user, color: Colors.white, size: 28),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  user?.fullName.toUpperCase() ?? "GUEST USER", 
+                  style: GoogleFonts.outfit(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800, letterSpacing: -0.5),
+                  maxLines: 1, overflow: TextOverflow.ellipsis,
+                ),
+                Text("IC: ${user?.icNumber ?? 'N/A'}", style: GoogleFonts.shareTechMono(color: Colors.white70, fontSize: 13)),
+              ]
+            ),
+          ),
+          _buildPillBadge("LVL ${progress.level}"),
+          const SizedBox(width: 8),
+          const Icon(LucideIcons.chevronDown, color: Colors.white54),
+          const SizedBox(width: 8),
+        ]
+      )
+    );
+  }
+
+  Widget _buildExpandedMedical(UserSession? user, bool isOwner) {
+    return Container(
+      key: const ValueKey('expanded'),
+      height: 260,
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+               Row(
+                 children: [
+                   const Icon(LucideIcons.heartPulse, color: Colors.white, size: 24),
+                   const SizedBox(width: 12),
+                   Text("EMERGENCY MEDICAL INFO", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1.5)),
+                 ],
+               ),
+               Row(
+                 children: [
+                   if (isOwner)
+                     GestureDetector(
+                       onTap: () {
+                         // Prevent collapse when hitting edit
+                         _showEditDialog();
+                       },
+                       child: Container(
+                         padding: const EdgeInsets.all(8),
+                         decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
+                         child: const Icon(LucideIcons.pencil, color: Colors.white, size: 16),
+                       ),
+                     ),
+                   const SizedBox(width: 16),
+                   const Icon(LucideIcons.chevronUp, color: Colors.white54),
+                 ]
+               )
+            ]
+          ),
+          const SizedBox(height: 32),
+          Row(
+            children: [
+               Expanded(child: _buildMedField("BLOOD TYPE", user?.bloodType ?? "Unknown")),
+               Expanded(child: _buildMedField("ALLERGIES", user?.allergies ?? "None")),
+            ]
+          ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+               Expanded(child: _buildMedField("CONDITION", user?.medicalCondition ?? "None")),
+               Expanded(child: _buildMedField("EMERGENCY CONTACT", user?.emergencyContact ?? "Not Set")),
+            ]
+          ),
+        ]
+      )
+    );
+  }
+
+  Widget _buildMedField(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+        const SizedBox(height: 6),
+        Text(value, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
+      ],
+    );
+  }
+
+  Widget _buildPillBadge(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(6),
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(20),
       ),
-      child: Text(text, style: GoogleFonts.outfit(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+      child: Text(text, style: GoogleFonts.outfit(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
     );
   }
 

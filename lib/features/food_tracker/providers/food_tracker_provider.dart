@@ -9,6 +9,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:my_sejahtera_ng/core/services/supabase_service.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+
 // --- DATA MODELS ---
 enum DrinkType { water, tea, coffee, juice, milk }
 
@@ -118,44 +121,97 @@ final foodTrackerProvider = StateNotifierProvider<FoodTrackerNotifier, FoodTrack
 class FoodTrackerNotifier extends StateNotifier<FoodTrackerState> {
   FoodTrackerNotifier() : super(FoodTrackerState()) {
     _supabase = SupabaseService().client;
-    _loadDailyLogs();
+    _init();
   }
 
   late final SupabaseClient _supabase;
   String get _todayKey => DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+  Future<File> get _settingsFile async {
+    final directory = await getApplicationDocumentsDirectory();
+    return File('${directory.path}/food_tracker_settings.json');
+  }
+
+  Future<void> _init() async {
+    await _loadSettings();
+    
+    // Listen to auth changes: Supabase session restoration takes a few milliseconds on Hot Restart.
+    // If we query instantly, currentUser is null and the logs disappear. This stream fixes that.
+    _supabase.auth.onAuthStateChange.listen((data) {
+      if (data.session != null) {
+        debugPrint("Auth Session available. Loading Daily Logs...");
+        _loadDailyLogs();
+      }
+    });
+
+    // Fallback load if already initialized
+    if (_supabase.auth.currentUser != null) {
+      _loadDailyLogs();
+    }
+  }
+
+  Future<void> _loadSettings() async {
+    try {
+      final file = await _settingsFile;
+      if (await file.exists()) {
+        final contents = await file.readAsString();
+        final data = jsonDecode(contents);
+        state = state.copyWith(
+          calorieTarget: data['calorieTarget'] ?? 2000,
+          allergies: List<String>.from(data['allergies'] ?? []),
+        );
+      }
+    } catch (e) {
+      debugPrint("Error loading Food Tracker settings: $e");
+    }
+  }
+
+  Future<void> _saveSettings() async {
+    try {
+      final file = await _settingsFile;
+      final data = {
+        'calorieTarget': state.calorieTarget,
+        'allergies': state.allergies,
+      };
+      await file.writeAsString(jsonEncode(data));
+    } catch (e) {
+      debugPrint("Error saving Food Tracker settings: $e");
+    }
+  }
 
   Future<void> _loadDailyLogs() async {
     try {
       final user = _supabase.auth.currentUser;
       if (user == null) return;
 
-      final today = DateTime.now().copyWith(hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0);
+      final today = DateTime.now();
       final sevenDaysAgo = today.subtract(const Duration(days: 6)); 
-      final endOfToday = today.copyWith(hour: 23, minute: 59, second: 59);
 
-      // Fetch logs for the past 7 days
+      // Fetch recent logs directly without PostgREST date formatting to guarantee no timezone mismatches
       final response = await _supabase
           .from('food_logs')
           .select()
           .eq('user_id', user.id)
-          .gte('created_at', sevenDaysAgo.toIso8601String())
-          .lte('created_at', endOfToday.toIso8601String());
+          .order('created_at', ascending: false)
+          .limit(200);
 
       final logs = (response as List).map((e) => FoodEntry.fromMap(e)).toList();
+      debugPrint("Loaded ${logs.length} logs from Supabase. (Filtering by date locally)");
       
-      final String todayKey = DateFormat('yyyy-MM-dd').format(DateTime.now());
+      final String todayKey = _todayKey;
       
-      // Separate today's logs for state
+      // Separate today's logs for state - IMPORTANT: use .toLocal() so UTC created_at matches phone timezone
       final todaysLogs = logs.where((log) {
-        if (log.createdAt == null) return false;
-        return DateFormat('yyyy-MM-dd').format(log.createdAt!) == todayKey;
+        // If createdAt is null (e.g. column named 'createdAt' instead of 'created_at' in db), assume it is today to prevent missing data on hot restart!
+        if (log.createdAt == null) return true; 
+        return DateFormat('yyyy-MM-dd').format(log.createdAt!.toLocal()) == todayKey;
       }).toList();
       
       // Build 7-day history map
       Map<String, int> history = {};
       for (var log in logs) {
         if (log.createdAt != null && log.type == null) { // Only count food calories, not water
-          final dateKey = DateFormat('yyyy-MM-dd').format(log.createdAt!);
+          final dateKey = DateFormat('yyyy-MM-dd').format(log.createdAt!.toLocal());
           history[dateKey] = (history[dateKey] ?? 0) + log.calories;
         }
       }
@@ -165,17 +221,22 @@ class FoodTrackerNotifier extends StateNotifier<FoodTrackerState> {
         drinks: todaysLogs.where((e) => e.type != null).toList(),
         dailyHistory: history,
       );
+
     } catch (e) {
       debugPrint("Error loading food logs: $e");
     }
   }
 
-  void setTarget(int target) => state = state.copyWith(calorieTarget: target);
+  void setTarget(int target) {
+    state = state.copyWith(calorieTarget: target);
+    _saveSettings();
+  }
 
   void toggleAllergy(String allergy) {
     final list = List<String>.from(state.allergies);
     list.contains(allergy) ? list.remove(allergy) : list.add(allergy);
     state = state.copyWith(allergies: list);
+    _saveSettings();
   }
 
   void reset() {
