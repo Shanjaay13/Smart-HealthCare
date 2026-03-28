@@ -204,8 +204,7 @@ class FoodTrackerNotifier extends StateNotifier<FoodTrackerState> {
       
       // Separate today's logs for state - IMPORTANT: use .toLocal() so UTC created_at matches phone timezone
       final todaysLogs = logs.where((log) {
-        // If createdAt is null (e.g. column named 'createdAt' instead of 'created_at' in db), assume it is today to prevent missing data on hot restart!
-        if (log.createdAt == null) return true; 
+        if (log.createdAt == null) return false; 
         return DateFormat('yyyy-MM-dd').format(log.createdAt!.toLocal()) == todayKey;
       }).toList();
       
@@ -244,6 +243,29 @@ class FoodTrackerNotifier extends StateNotifier<FoodTrackerState> {
   void reset() {
     state = FoodTrackerState();
     _loadDailyLogs();
+  }
+
+  Future<void> resetToday() async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) return;
+      
+      final List<int> todayIds = [];
+      for (var f in state.foods) { if (f.id != null) todayIds.add(f.id!); }
+      for (var d in state.drinks) { if (d.id != null) todayIds.add(d.id!); }
+      
+      if (todayIds.isNotEmpty) {
+        // Fallback to loop just in case inFilter or in_ raises syntax errors based on SDK version
+        for (final id in todayIds) {
+          await _supabase.from('food_logs').delete().eq('id', id);
+        }
+      }
+          
+      state = state.copyWith(foods: [], drinks: []);
+      _updateHistory();
+    } catch (e) {
+      debugPrint("Error resetting today's logs: $e");
+    }
   }
 
   // --- ALLERGEN DICTIONARY ---
@@ -367,6 +389,25 @@ class FoodTrackerNotifier extends StateNotifier<FoodTrackerState> {
     }
   }
 
+  Future<void> removeDrink() async {
+    try {
+      if (state.drinks.isEmpty) return;
+      
+      final lastDrink = state.drinks.last;
+      if (lastDrink.id != null) {
+        await _supabase.from('food_logs').delete().eq('id', lastDrink.id!);
+      }
+      
+      final updatedDrinks = List<FoodEntry>.from(state.drinks);
+      updatedDrinks.removeLast();
+      
+      state = state.copyWith(drinks: updatedDrinks);
+      _updateHistory();
+    } catch (e) {
+      debugPrint("Error removing drink: $e");
+    }
+  }
+
   Future<Map<String, dynamic>?> analyzeFoodImage(XFile image) async {
     state = state.copyWith(isScanning: true);
     
@@ -389,7 +430,7 @@ class FoodTrackerNotifier extends StateNotifier<FoodTrackerState> {
           'Authorization': 'Bearer $apiKey',
         },
         body: jsonEncode({
-          "model": "meta-llama/llama-4-maverick-17b-128e-instruct",
+          "model": "meta-llama/llama-4-scout-17b-16e-instruct",
           "messages": [
             {
               "role": "user",

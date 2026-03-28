@@ -6,6 +6,7 @@ import 'package:my_sejahtera_ng/features/auth/screens/login_screen.dart';
 import 'package:my_sejahtera_ng/features/dashboard/screens/dashboard_screen.dart';
 import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:my_sejahtera_ng/features/digital_health/services/notification_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -23,6 +24,9 @@ class _SplashScreenState extends State<SplashScreen> {
       if (mounted) {
          final session = Supabase.instance.client.auth.currentSession;
          final Widget nextScreen = session != null ? const DashboardScreen() : const LoginScreen();
+         
+         // Request notification permissions after the app has drawn a frame
+         NotificationService().requestPermissions();
 
          Navigator.of(context).pushReplacement(
            PageRouteBuilder(

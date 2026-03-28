@@ -407,29 +407,58 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                   ),
                 ],
               ),
-              GestureDetector(
-                onTap: () => ref
-                    .read(foodTrackerProvider.notifier)
-                    .addDrink("Water", 0, DrinkType.water),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF0EA5E9).withOpacity(0.2),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: () => ref
+                        .read(foodTrackerProvider.notifier)
+                        .removeDrink(),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF0EA5E9).withOpacity(0.2),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
-                    ],
+                      child: const Icon(
+                        LucideIcons.minus,
+                        color: Color(0xFF0EA5E9),
+                        size: 24,
+                      ),
+                    ),
                   ),
-                  child: const Icon(
-                    LucideIcons.plus,
-                    color: Color(0xFF0EA5E9),
-                    size: 24,
+                  const SizedBox(width: 12),
+                  GestureDetector(
+                    onTap: () => ref
+                        .read(foodTrackerProvider.notifier)
+                        .addDrink("Water", 0, DrinkType.water),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF0EA5E9).withOpacity(0.2),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Icon(
+                        LucideIcons.plus,
+                        color: Color(0xFF0EA5E9),
+                        size: 24,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
@@ -2000,7 +2029,7 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
               ),
             ),
             onPressed: () {
-              // ref.read(foodTrackerProvider.notifier).resetToday();
+              ref.read(foodTrackerProvider.notifier).resetToday();
               Navigator.pop(ctx);
             },
             child: const Text("Reset"),

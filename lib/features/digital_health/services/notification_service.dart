@@ -53,11 +53,11 @@ class NotificationService {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
-    // Request permissions
-    await _requestPermissions();
+    // Request permissions later when UI is ready
+    // _requestPermissions() is now called from the UI
   }
 
-  Future<void> _requestPermissions() async {
+  Future<void> requestPermissions() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
        final androidImplementation = flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
        await androidImplementation?.requestNotificationsPermission();

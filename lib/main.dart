@@ -10,13 +10,31 @@ import 'package:flutter_dotenv/flutter_dotenv.dart'; // Add this import
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env"); // Load env file
-  await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL'] ?? '',
-    anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
-  );
-  await NotificationService().init();
-  runApp(const ProviderScope(child: MyApp()));
+  
+  try {
+    await dotenv.load(fileName: ".env"); // Load env file
+    await Supabase.initialize(
+      url: dotenv.env['SUPABASE_URL'] ?? '',
+      anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
+    );
+    await NotificationService().init();
+    runApp(const ProviderScope(child: MyApp()));
+  } catch (e, stackTrace) {
+    debugPrint('Initialization Error: $e');
+    runApp(MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        appBar: AppBar(title: const Text('App Initialization Error'), backgroundColor: Colors.red),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            'Fail: $e\n\nStackTrace:\n$stackTrace',
+            style: const TextStyle(color: Colors.red, fontSize: 16),
+          ),
+        ),
+      ),
+    ));
+  }
 }
 
 class MyApp extends ConsumerWidget {
