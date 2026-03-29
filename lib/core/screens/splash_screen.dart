@@ -20,23 +20,36 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     // Navigate to Dashboard or Login after animation
-    Future.delayed(const Duration(milliseconds: 3500), () {
-      if (mounted) {
-         final session = Supabase.instance.client.auth.currentSession;
-         final Widget nextScreen = session != null ? const DashboardScreen() : const LoginScreen();
-         
-         // Request notification permissions after the app has drawn a frame
-         NotificationService().requestPermissions();
+    Future.delayed(const Duration(milliseconds: 3500), () async {
+      if (!mounted) return;
+      
+      final session = Supabase.instance.client.auth.currentSession;
+      Widget nextScreen = const LoginScreen();
+      
+      if (session != null) {
+        try {
+          // Explicitly ping the API to verify the token is actually still valid on the server
+          await Supabase.instance.client.auth.getUser();
+          nextScreen = const DashboardScreen();
+        } catch (e) {
+          // If token is invalid/expired/deleted, clear local session
+          await Supabase.instance.client.auth.signOut();
+        }
+      }
+      
+      // Request notification permissions after the app has drawn a frame
+      NotificationService().requestPermissions();
 
-         Navigator.of(context).pushReplacement(
-           PageRouteBuilder(
-             pageBuilder: (_, __, ___) => nextScreen,
-             transitionsBuilder: (_, animation, __, child) {
-               return FadeTransition(opacity: animation, child: child);
-             },
-             transitionDuration: const Duration(milliseconds: 800),
-           ),
-         );
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (_, __, ___) => nextScreen,
+            transitionsBuilder: (_, animation, __, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 800),
+          ),
+        );
       }
     });
   }

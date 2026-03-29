@@ -325,6 +325,16 @@ class FoodTrackerNotifier extends StateNotifier<FoodTrackerState> {
     }
   }
 
+  Future<void> deleteDrink(int id) async {
+    try {
+      await _supabase.from('food_logs').delete().eq('id', id);
+      state = state.copyWith(drinks: state.drinks.where((d) => d.id != id).toList());
+      _updateHistory();
+    } catch (e) {
+      debugPrint("Error deleting drink: $e");
+    }
+  }
+
   Future<void> updateFood(int id, String newName, int newCal) async {
     try {
       final response = await _supabase.from('food_logs').update({

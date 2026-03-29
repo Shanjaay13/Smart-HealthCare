@@ -156,7 +156,7 @@ class AppointmentNotifier extends Notifier<AppointmentState> {
         'user_id': user.id,
         'clinic_name': clinicName,
         'service_name': serviceName,
-        'appointment_time': time.toIso8601String(),
+        'appointment_time': time.toUtc().toIso8601String(),
         'price': price,
         'status': 'Confirmed'
       }).select().single();

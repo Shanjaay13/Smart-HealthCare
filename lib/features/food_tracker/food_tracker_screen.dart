@@ -435,9 +435,7 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                   ),
                   const SizedBox(width: 12),
                   GestureDetector(
-                    onTap: () => ref
-                        .read(foodTrackerProvider.notifier)
-                        .addDrink("Water", 0, DrinkType.water),
+                    onTap: () => _logEntry(context, ref, true),
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -506,7 +504,10 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
     WidgetRef ref,
     FoodTrackerState state,
   ) {
-    if (state.foods.isEmpty) {
+    final allEntries = [...state.foods, ...state.drinks];
+    // Sort logic placeholder if they have timestamps, but for now we'll just show them
+    
+    if (allEntries.isEmpty) {
       return Container(
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
@@ -515,7 +516,7 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
         ),
         child: const Center(
           child: Text(
-            "No meals logged yet. Tell the AI what you ate!",
+            "No meals or drinks logged yet.",
             textAlign: TextAlign.center,
             style: TextStyle(color: AppTheme.textMuted),
           ),
@@ -523,7 +524,10 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
       );
     }
     return Column(
-      children: state.foods.map((food) {
+      children: allEntries.map((entry) {
+        final isDrink = entry.type != null;
+        final iconStr = isDrink ? "💧" : "🍲";
+
         return Container(
           margin: const EdgeInsets.only(bottom: 24),
           child: Row(
@@ -537,19 +541,23 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                       color: AppTheme.bgLight,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text("🍲", style: TextStyle(fontSize: 24)),
+                    child: Text(iconStr, style: const TextStyle(fontSize: 24)),
                   ),
                 ],
               ),
               const SizedBox(width: 20),
               Expanded(
                 child: GestureDetector(
-                  onTap: () => _showEditFoodDialog(context, ref, food),
+                  onTap: () {
+                     if (!isDrink) {
+                        _showEditFoodDialog(context, ref, entry);
+                     }
+                  },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        food.name,
+                        entry.name,
                         style: GoogleFonts.outfit(
                           color: AppTheme.textDark,
                           fontSize: 18,
@@ -566,7 +574,7 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            "${food.calories} kcal",
+                            "${entry.calories} kcal",
                             style: GoogleFonts.outfit(
                               color: const Color(0xFFD97706),
                               fontWeight: FontWeight.w800,
@@ -591,8 +599,15 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
                     size: 18,
                   ),
                 ),
-                onTap: () =>
-                    ref.read(foodTrackerProvider.notifier).deleteFood(food.id!),
+                onTap: () {
+                  if (entry.id != null) {
+                    if (isDrink) {
+                       ref.read(foodTrackerProvider.notifier).deleteDrink(entry.id!);
+                    } else {
+                       ref.read(foodTrackerProvider.notifier).deleteFood(entry.id!);
+                    }
+                  }
+                },
               ),
             ],
           ),
@@ -1878,15 +1893,22 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.surfaceWhite,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
       builder: (ctx) => StatefulBuilder(
-        builder: (context, setST) => Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+        builder: (context, setST) => SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 32,
+              right: 32,
+              top: 32,
+              bottom: MediaQuery.of(context).padding.bottom + 32,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
                 "Select Allergens",
@@ -1975,6 +1997,7 @@ class _FoodTrackerScreenState extends ConsumerState<FoodTrackerScreen> {
             ],
           ),
         ),
+      ),
       ),
     );
   }
