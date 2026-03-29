@@ -25,8 +25,11 @@ class _UpcomingAppointmentsCarouselState extends ConsumerState<UpcomingAppointme
     final appointmentState = ref.watch(appointmentProvider);
     final now = DateTime.now();
     final appointments = appointmentState.appointments
-        .where((a) => a.dateTime.isAfter(now))
+        .where((a) => a.status != 'Completed')
         .toList();
+        
+    // Ensure oldest (past) appointments appear first so they aren't hidden
+    appointments.sort((a, b) => a.dateTime.compareTo(b.dateTime));
 
     if (appointments.isEmpty) {
       return const SizedBox.shrink();
@@ -34,13 +37,16 @@ class _UpcomingAppointmentsCarouselState extends ConsumerState<UpcomingAppointme
 
     if (appointments.length == 1) {
       return Padding(
-        padding: const EdgeInsets.only(bottom: 24),
-        child: AppointmentCard(appointment: appointments.first),
+        padding: const EdgeInsets.only(top: 32, bottom: 24),
+        child: SizedBox(
+          height: 345,
+          child: AppointmentCard(appointment: appointments.first),
+        ),
       );
     }
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.only(top: 32, bottom: 24),
       child: Column(
         children: [
           SizedBox(

@@ -179,16 +179,20 @@ class _HotspotScreenState extends State<HotspotScreen> {
       
       final List<dynamic> data = response as List<dynamic>;
       setState(() {
-         _hotspots = data.map((item) {
-           return CircleMarker(
-             point: LatLng(item['latitude'], item['longitude']),
-             radius: (item['radius_meters'] as num).toDouble(),
-             useRadiusInMeter: true,
-             color: (item['risk_level'] == 'High' ? Colors.red : Colors.orange).withOpacity(0.3),
-             borderColor: item['risk_level'] == 'High' ? Colors.red : Colors.orange,
-             borderStrokeWidth: 2,
-           );
-         }).toList();
+         if (data.isEmpty) {
+             _hotspots = _generateRandomHotspots(center);
+         } else {
+             _hotspots = data.map((item) {
+               return CircleMarker(
+                 point: LatLng(item['latitude'], item['longitude']),
+                 radius: (item['radius_meters'] as num).toDouble(),
+                 useRadiusInMeter: true,
+                 color: (item['risk_level'] == 'High' ? Colors.red : Colors.orange).withOpacity(0.3),
+                 borderColor: item['risk_level'] == 'High' ? Colors.red : Colors.orange,
+                 borderStrokeWidth: 2,
+               );
+             }).toList();
+         }
          _isLoading = false;
       });
       
@@ -201,8 +205,29 @@ class _HotspotScreenState extends State<HotspotScreen> {
     }
   }
 
-  // Legacy Random Generator (Removed)
-  // List<CircleMarker> _generateRandomHotspots(LatLng center) { ... }
+  List<CircleMarker> _generateRandomHotspots(LatLng center) {
+    final random = Random();
+    // Generate more concentrated hotspots in Predictive mode
+    int count = _isPredictiveMode ? 8 : 5;
+    
+    return List.generate(count, (index) {
+      double latOffset = (random.nextDouble() - 0.5) * (_isPredictiveMode ? 0.04 : 0.02);
+      double lngOffset = (random.nextDouble() - 0.5) * (_isPredictiveMode ? 0.04 : 0.02);
+      
+      // Predictive mode favors warning (orange), Normal favors confirmed (red)
+      bool isHighRisk = _isPredictiveMode ? random.nextDouble() > 0.7 : random.nextBool();
+      Color baseColor = isHighRisk ? Colors.red : Colors.orange;
+      
+      return CircleMarker(
+        point: LatLng(center.latitude + latOffset, center.longitude + lngOffset),
+        color: baseColor.withOpacity(0.3),
+        borderColor: baseColor,
+        borderStrokeWidth: 2,
+        useRadiusInMeter: true,
+        radius: 100 + random.nextDouble() * (_isPredictiveMode ? 500 : 300),
+      );
+    });
+  }
 
   bool _isPredictiveMode = false;
 

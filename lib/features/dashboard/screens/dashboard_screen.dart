@@ -19,6 +19,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_sejahtera_ng/features/gamification/providers/quest_provider.dart';
 import 'package:my_sejahtera_ng/core/theme/app_theme.dart';
 import 'package:my_sejahtera_ng/features/dashboard/widgets/upcoming_appointments_carousel.dart';
+import 'package:my_sejahtera_ng/features/health_assistant/providers/appointment_provider.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -102,21 +103,20 @@ class DashboardScreen extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 8),
-        const HoloIdCard().animate().fadeIn(delay: 200.ms).slideY(begin: 0.1, end: 0, duration: 800.ms, curve: Curves.easeOutCubic).scale(begin: const Offset(0.9, 0.9), delay: 200.ms),
+        const HoloIdCard().animate(key: const ValueKey('holo')).fadeIn(delay: 200.ms).slideY(begin: 0.1, end: 0, duration: 800.ms, curve: Curves.easeOutCubic).scale(begin: const Offset(0.9, 0.9), delay: 200.ms),
         
-        const SizedBox(height: 32),
-        const UpcomingAppointmentsCarousel().animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0).flipH(begin: 0.1, end: 0),
+        const UpcomingAppointmentsCarousel().animate(key: const ValueKey('carousel')).fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0).flipH(begin: 0.1, end: 0),
         
         const SizedBox(height: 16),
-        const HealthInsightBanner().animate().fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0).shimmer(delay: 1.seconds, duration: 2.seconds, blendMode: BlendMode.overlay, color: Colors.white24),
+        const HealthInsightBanner().animate(key: const ValueKey('hb')).fadeIn(delay: 400.ms).slideY(begin: 0.1, end: 0).shimmer(delay: 1.seconds, duration: 2.seconds, blendMode: BlendMode.overlay, color: Colors.white24),
         
         const SizedBox(height: 24),
-        const CalorieInsightCard().animate().fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
+        const CalorieInsightCard().animate(key: const ValueKey('cal')).fadeIn(delay: 500.ms).slideY(begin: 0.1, end: 0),
 
         const SizedBox(height: 32),
-        _buildSectionTitle(context, "Quick Access").animate().fadeIn(delay: 600.ms).slideX(begin: -0.1, end: 0),
+        _buildSectionTitle(context, "Quick Access").animate(key: const ValueKey('titleqa')).fadeIn(delay: 600.ms).slideX(begin: -0.1, end: 0),
         const SizedBox(height: 24),
-        _buildOrganicQuickAccess(context, ref).animate().fadeIn(delay: 700.ms).slideY(begin: 0.1, end: 0),
+        _buildOrganicQuickAccess(context, ref).animate(key: const ValueKey('qa')).fadeIn(delay: 700.ms).slideY(begin: 0.1, end: 0),
         
         const SizedBox(height: 48),
         const QuestBoard().animate().fadeIn(delay: 800.ms).slideY(begin: 0.1, end: 0),
@@ -156,15 +156,15 @@ class DashboardScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const UpcomingAppointmentsCarousel().animate().fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
+                  const UpcomingAppointmentsCarousel().animate(key: const ValueKey('d_carousel')).fadeIn(delay: 300.ms).slideY(begin: 0.1, end: 0),
                   const SizedBox(height: 24),
                   
-                  _buildSectionTitle(context, "Quick Access").animate().fadeIn(delay: 600.ms).slideX(begin: -0.1, end: 0),
+                  _buildSectionTitle(context, "Quick Access").animate(key: const ValueKey('d_titleqa')).fadeIn(delay: 600.ms).slideX(begin: -0.1, end: 0),
                   const SizedBox(height: 24),
-                  _buildOrganicQuickAccess(context, ref).animate().fadeIn(delay: 700.ms).slideY(begin: 0.1, end: 0),
+                  _buildOrganicQuickAccess(context, ref).animate(key: const ValueKey('d_qa')).fadeIn(delay: 700.ms).slideY(begin: 0.1, end: 0),
                   
                   const SizedBox(height: 48),
-                  const QuestBoard().animate().fadeIn(delay: 800.ms).slideY(begin: 0.1, end: 0),
+                  const QuestBoard().animate(key: const ValueKey('d_qb')).fadeIn(delay: 800.ms).slideY(begin: 0.1, end: 0),
                 ],
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/foundation.dart';
+import 'package:my_sejahtera_ng/core/providers/user_provider.dart';
 
 class Appointment {
   final String id;
@@ -10,6 +11,7 @@ class Appointment {
   final String type; // e.g., "General Checkup", "Vaccination"
   final String? notes;
   final double price;
+  final String status;
 
   Appointment({
     required this.id,
@@ -18,6 +20,7 @@ class Appointment {
     required this.dateTime,
     required this.type,
     this.price = 0.0,
+    this.status = 'Confirmed',
     this.notes,
   });
 }
@@ -60,6 +63,8 @@ class AppointmentNotifier extends Notifier<AppointmentState> {
 
   @override
   AppointmentState build() {
+    // Watch userProvider to guarantee auth state is hydrated before fetching
+    ref.watch(userProvider);
     _loadAppointments();
     return AppointmentState();
   }
@@ -83,7 +88,7 @@ class AppointmentNotifier extends Notifier<AppointmentState> {
           dateTime: DateTime.parse(data['appointment_time']),
           type: data['service_name'] ?? 'General',
           price: (data['price'] as num).toDouble(),
-          // status: data['status']
+          status: data['status'] ?? 'Confirmed',
         );
       }).toList();
 
@@ -169,6 +174,7 @@ class AppointmentNotifier extends Notifier<AppointmentState> {
         dateTime: time,
         type: serviceName,
         price: price,
+        status: 'Confirmed',
       );
 
       state = state.copyWith(
@@ -199,7 +205,7 @@ class AppointmentNotifier extends Notifier<AppointmentState> {
     try {
       final response = await _supabase
           .from('appointments')
-          .update({'appointment_time': newTime.toIso8601String()})
+          .update({'appointment_time': newTime.toUtc().toIso8601String()})
           .eq('id', id)
           .select()
           .single();
@@ -213,6 +219,7 @@ class AppointmentNotifier extends Notifier<AppointmentState> {
             dateTime: newTime,
             type: a.type,
             price: a.price,
+            status: a.status,
             notes: a.notes,
           );
         }
@@ -222,6 +229,35 @@ class AppointmentNotifier extends Notifier<AppointmentState> {
       state = state.copyWith(appointments: updatedAppointments);
     } catch (e) {
       debugPrint("Error updating appointment: $e");
+    }
+  }
+
+  Future<void> markCompleted(String id) async {
+    try {
+      await _supabase
+          .from('appointments')
+          .update({'status': 'Completed'})
+          .eq('id', id);
+
+      final updatedAppointments = state.appointments.map((a) {
+        if (a.id == id) {
+          return Appointment(
+            id: a.id,
+            doctorName: a.doctorName,
+            hospitalName: a.hospitalName,
+            dateTime: a.dateTime,
+            type: a.type,
+            price: a.price,
+            status: 'Completed',
+            notes: a.notes,
+          );
+        }
+        return a;
+      }).toList();
+
+      state = state.copyWith(appointments: updatedAppointments);
+    } catch (e) {
+      debugPrint("Error marking appointment complete: $e");
     }
   }
 

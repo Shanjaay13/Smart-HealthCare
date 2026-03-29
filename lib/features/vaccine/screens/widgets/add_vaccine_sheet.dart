@@ -83,6 +83,56 @@ class _AddVaccineSheetState extends ConsumerState<AddVaccineSheet> {
           'date_administered': _selectedDate.toIso8601String().split('T')[0],
         };
 
+        final vaccineName = _nameController.text.trim();
+        final doseNumber = int.tryParse(_doseController.text.trim()) ?? 1;
+
+        var query = supabase
+            .from('vaccine_records')
+            .select()
+            .eq('user_id', user.id)
+            .eq('dose_number', doseNumber);
+
+        final duplicates = widget.initialRecord != null 
+            ? await query.neq('id', widget.initialRecord!['id']) 
+            : await query;
+
+        if (doseNumber < 1 || doseNumber > 10) {
+          if (mounted) {
+            showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                backgroundColor: const Color(0xFF161B1E),
+                title: const Text("Invalid Dose", style: TextStyle(color: Colors.redAccent)),
+                content: const Text("Dose number must be between 1 and 10.", style: TextStyle(color: Colors.white70)),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("OK", style: TextStyle(color: AppTheme.accentTeal)))
+                ],
+              )
+            );
+            setState(() => _isLoading = false);
+          }
+          return;
+        }
+
+        if (duplicates.isNotEmpty) {
+          if (mounted) {
+            final existingName = duplicates.first['vaccine_name'];
+            showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                backgroundColor: const Color(0xFF161B1E),
+                title: const Text("Duplicate Detected", style: TextStyle(color: Colors.redAccent)),
+                content: Text("You already have Dose $doseNumber recorded under $existingName. Please edit the existing record instead.", style: const TextStyle(color: Colors.white70)),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("OK", style: TextStyle(color: AppTheme.accentTeal)))
+                ],
+              )
+            );
+            setState(() => _isLoading = false);
+          }
+          return;
+        }
+
         if (widget.initialRecord == null) {
           // Create new record
           await supabase.from('vaccine_records').insert(data);
@@ -130,6 +180,7 @@ class _AddVaccineSheetState extends ConsumerState<AddVaccineSheet> {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       decoration: BoxDecoration(
+        color: const Color(0xFF161B1E),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         border: Border.all(color: Colors.white10),
       ),

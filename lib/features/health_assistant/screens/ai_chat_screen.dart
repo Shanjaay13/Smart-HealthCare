@@ -301,6 +301,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
         text.toLowerCase().contains("heart attack") || 
         text.toLowerCase().contains("can't breathe")) {
       
+      FocusScope.of(context).unfocus(); // Instantly hide keyboard to prevent layout overflow
       setState(() => _isEmergency = true);
       HapticFeedback.heavyImpact();
       return;
@@ -2092,10 +2093,11 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
           ),
           
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                    Container(
                      padding: const EdgeInsets.all(24),
@@ -2173,7 +2175,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                      ),
                    ),
                    
-                   const Spacer(),
+                   const SizedBox(height: 48), // Replaced Spacer for scroll compatibility
                    
                    // Dismiss Button
                    TextButton(
@@ -2190,6 +2192,7 @@ class _AIChatScreenState extends ConsumerState<AIChatScreen> {
                 ],
               ),
             ),
+           ),
           ),
         ],
       ),

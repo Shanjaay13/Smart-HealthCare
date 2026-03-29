@@ -13,6 +13,8 @@ class AppointmentCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isPassed = appointment.dateTime.isBefore(DateTime.now());
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
       width: double.infinity,
@@ -48,8 +50,8 @@ class AppointmentCard extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        "UPCOMING APPOINTMENT", 
-                        style: GoogleFonts.outfit(color: AppTheme.textMuted, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.5),
+                        isPassed ? "PASSED APPOINTMENT" : "UPCOMING APPOINTMENT", 
+                        style: GoogleFonts.outfit(color: isPassed ? AppTheme.error : AppTheme.textMuted, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.5),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -60,13 +62,13 @@ class AppointmentCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: AppTheme.success.withOpacity(0.1),
+                  color: isPassed ? AppTheme.error.withOpacity(0.1) : AppTheme.success.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  "CONFIRMED",
+                  isPassed ? "ACTION NEEDED" : "CONFIRMED",
                   style: GoogleFonts.outfit(
-                    color: AppTheme.success,
+                    color: isPassed ? AppTheme.error : AppTheme.success,
                     fontWeight: FontWeight.bold,
                     fontSize: 10,
                     letterSpacing: 1,
@@ -86,11 +88,11 @@ class AppointmentCard extends ConsumerWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryBlue,
+                  color: isPassed ? Colors.grey[600] : AppTheme.primaryBlue,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                      BoxShadow(
-                       color: AppTheme.primaryBlue.withOpacity(0.3), 
+                       color: isPassed ? Colors.transparent : AppTheme.primaryBlue.withOpacity(0.3), 
                        blurRadius: 16, 
                        offset: const Offset(0, 8)
                      )
@@ -132,7 +134,23 @@ class AppointmentCard extends ConsumerWidget {
           
           // Bottom Action buttons
           Row(
-             children: [
+             children: isPassed ? [
+                Expanded(
+                  child: TextButton.icon(
+                    onPressed: () {
+                         ref.read(appointmentProvider.notifier).markCompleted(appointment.id);
+                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Appointment marked as completed.")));
+                    },
+                    icon: const Icon(LucideIcons.checkCircle2, size: 18, color: Colors.white),
+                    label: Text("Mark Complete", style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: AppTheme.success,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    )
+                  )
+                )
+             ] : [
                Expanded(
                  child: TextButton.icon(
                    onPressed: () => _editTime(context, ref),
